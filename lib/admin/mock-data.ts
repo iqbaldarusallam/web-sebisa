@@ -31,7 +31,7 @@ export const mockPortfolio: AdminPortfolioItem[] = portfolioItems.map((item, ind
   name: item.name,
   category: item.category,
   description: item.description,
-  imageUrl: item.image,
+  imageUrl: item.image ?? "",
   projectUrl: null,
   isFeatured: index < 4,
   isPublished: true,

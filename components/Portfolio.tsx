@@ -67,14 +67,20 @@ export default function Portfolio({ items = portfolioItems }: { items?: Portfoli
                   </h3>
 
                   <div className="mt-3 aspect-[1.48/1] w-full overflow-hidden rounded-lg bg-white p-2">
-                    <Image
-                      src={item.image}
-                      alt={`${item.name} portfolio preview`}
-                      width={620}
-                      height={430}
-                      unoptimized
-                      className="h-full w-full object-contain transition duration-300"
-                    />
+                    {item.image ? (
+                      <Image
+                        src={item.image}
+                        alt={`${item.name} portfolio preview`}
+                        width={620}
+                        height={430}
+                        unoptimized
+                        className="h-full w-full object-contain transition duration-300"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center rounded-md bg-[#EAF8FF] px-4 text-center text-xs font-extrabold leading-5 text-[#12345A]/55">
+                        Gambar dari CMS
+                      </div>
+                    )}
                   </div>
 
                   <div className="mt-4 flex flex-1 flex-col">

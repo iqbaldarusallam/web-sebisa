@@ -36,15 +36,7 @@ export default async function PortofolioPage() {
     <>
       <Navbar />
       <main className="relative min-h-screen overflow-hidden bg-[#18233F] pt-24 text-white sm:pt-28">
-        <Image
-          src="/background/bg-portfolio.png"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-[#18233F]/30" />
+        <div className="absolute inset-0 bg-[#18233F]" />
 
         <section className="relative z-10 mx-auto flex min-h-[calc(100vh-7rem)] w-full max-w-7xl flex-col px-4 py-10 sm:px-8 lg:px-20">
           <div className="grid gap-7 lg:grid-cols-[1fr_0.72fr] lg:items-start">
@@ -110,14 +102,20 @@ export default async function PortofolioPage() {
                   </h2>
 
                   <div className="mt-2 aspect-[1.34/1] w-full overflow-hidden rounded-md bg-white p-1 sm:mt-3 sm:p-1.5">
-                    <Image
-                      src={item.image}
-                      alt={`${item.name} portfolio preview`}
-                      width={620}
-                      height={430}
-                      unoptimized
-                      className="h-full w-full object-contain transition duration-300"
-                    />
+                    {item.image ? (
+                      <Image
+                        src={item.image}
+                        alt={`${item.name} portfolio preview`}
+                        width={620}
+                        height={430}
+                        unoptimized
+                        className="h-full w-full object-contain transition duration-300"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center rounded-sm bg-[#EAF8FF] px-3 text-center text-[0.6rem] font-extrabold leading-4 text-[#12345A]/55 sm:text-xs">
+                        Gambar dari CMS
+                      </div>
+                    )}
                   </div>
 
                   <div className="mt-2 flex flex-1 flex-col sm:mt-3">

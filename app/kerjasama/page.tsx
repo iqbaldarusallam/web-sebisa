@@ -19,15 +19,7 @@ export default async function KerjasamaPage() {
     <>
       <Navbar />
       <main className="relative min-h-screen overflow-hidden bg-[#18233F] pt-32 text-white">
-        <Image
-          src="/background/bg-kerjasama.png"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-[#17233F]/20" />
+        <div className="absolute inset-0 bg-[#18233F]" />
 
         <section className="relative z-10 mx-auto flex min-h-[calc(100vh-8rem)] w-full max-w-[1780px] flex-col px-6 py-16 sm:px-10 lg:px-20 xl:px-28">
           <div className="max-w-[680px]">

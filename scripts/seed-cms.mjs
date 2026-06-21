@@ -151,7 +151,7 @@ await insertIfEmpty(
     name: item.name,
     category: item.category,
     description: item.description,
-    image_url: item.image,
+    image_url: item.image ?? null,
     project_url: null,
     is_featured: index < 4,
     is_published: true,

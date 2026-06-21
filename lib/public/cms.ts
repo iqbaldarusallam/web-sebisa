@@ -161,7 +161,7 @@ export async function getPublicCmsContent(): Promise<PublicCmsContent> {
               filterCategory: item.category as PortfolioItem["filterCategory"],
               description: item.description,
               colors: ["#06B6D4", "#141D38", "#22C55E", "#E0F2FE", "#0891B2", "#64748B"],
-              image: item.image_url || "/portfolio/gapura.svg",
+              image: item.image_url,
             }))
           : fallbackPortfolio,
       team:
