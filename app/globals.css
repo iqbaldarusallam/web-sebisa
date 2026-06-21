@@ -1,26 +1,204 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0f1e;
+  --foreground: #f8fafc;
+  --font-primary: "Plus Jakarta Sans", "Segoe UI", Arial, Helvetica, sans-serif;
+  --font-code: "Cascadia Mono", Consolas, monospace;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-primary);
+  --font-mono: var(--font-code);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0a0f1e;
+    --foreground: #f8fafc;
   }
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  text-size-adjust: 100%;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-primary);
+  overflow-x: hidden;
+}
+
+button,
+a,
+input {
+  font: inherit;
+}
+
+::selection {
+  background: #06b6d4;
+  color: #0a0f1e;
+}
+
+.marquee-track {
+  width: max-content;
+  animation: sebisa-marquee 34s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.sebisa-hidden-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.sebisa-hidden-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.testimonial-carousel-track {
+  padding-right: max(0px, calc(100vw - 18rem - 3rem));
+}
+
+.sebisa-scroll-slider {
+  appearance: none;
+  background: rgba(255, 255, 255, 0.82);
+  border-radius: 9999px;
+  cursor: pointer;
+  display: block;
+  height: 0.5rem;
+}
+
+.sebisa-scroll-slider::-webkit-slider-thumb {
+  appearance: none;
+  background: #12345a;
+  border: 0;
+  border-radius: 9999px;
+  height: 0.5rem;
+  width: 5.5rem;
+}
+
+.sebisa-scroll-slider::-moz-range-thumb {
+  background: #12345a;
+  border: 0;
+  border-radius: 9999px;
+  height: 0.5rem;
+  width: 5.5rem;
+}
+
+.interactive-lift {
+  transform: translateY(0);
+}
+
+.interactive-lift:hover {
+  transform: translateY(-0.35rem);
+}
+
+.slider-arrow {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(18, 52, 90, 0.18);
+  border-radius: 9999px;
+  color: #12345a;
+  cursor: pointer;
+  display: inline-flex;
+  flex-shrink: 0;
+  height: 2.5rem;
+  justify-content: center;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease,
+    opacity 180ms ease;
+  width: 2.5rem;
+}
+
+.slider-arrow:hover:not(:disabled) {
+  background: #06b6d4;
+  border-color: #06b6d4;
+  color: white;
+  transform: translateY(-0.12rem);
+}
+
+.slider-arrow:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 15px;
+  }
+
+  .interactive-lift:hover {
+    transform: translateY(-0.18rem);
+  }
+
+  .sebisa-scroll-slider::-webkit-slider-thumb {
+    width: 3.5rem;
+  }
+
+  .sebisa-scroll-slider::-moz-range-thumb {
+    width: 3.5rem;
+  }
+
+  .slider-arrow {
+    height: 2.25rem;
+    width: 2.25rem;
+  }
+}
+
+@media (max-width: 380px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 340px) {
+  html {
+    font-size: 13.25px;
+  }
+}
+
+@keyframes sebisa-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (min-width: 640px) {
+  .testimonial-carousel-track {
+    padding-right: max(0px, calc(100vw - 20rem - 9rem));
+  }
+}
+
+@media (min-width: 1024px) {
+  .testimonial-carousel-track {
+    padding-right: max(0px, calc(min(100vw, 80rem) - 21.5rem - 10rem));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .marquee-track {
+    animation: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: auto;
+  }
 }

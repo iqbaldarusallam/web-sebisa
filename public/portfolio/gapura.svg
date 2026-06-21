@@ -1,0 +1,15 @@
+<svg width="620" height="430" viewBox="0 0 620 430" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="620" height="430" rx="18" fill="#DFF3FF"/>
+  <rect x="34" y="30" width="552" height="370" rx="12" fill="white"/>
+  <rect x="62" y="58" width="228" height="150" rx="6" fill="#12345A"/>
+  <rect x="316" y="58" width="110" height="150" rx="6" fill="#0B1722"/>
+  <rect x="446" y="58" width="110" height="150" rx="6" fill="#27B4D7"/>
+  <rect x="62" y="232" width="146" height="100" rx="6" fill="#1A6B93"/>
+  <rect x="230" y="232" width="146" height="100" rx="6" fill="#F4B13A"/>
+  <rect x="398" y="232" width="158" height="100" rx="6" fill="#22C55E"/>
+  <circle cx="177" cy="133" r="44" fill="#DFF3FF"/>
+  <rect x="340" y="86" width="62" height="94" rx="8" fill="#DFF3FF" fill-opacity=".85"/>
+  <path d="M493 82l39 98h-78l39-98z" fill="#DFF3FF" fill-opacity=".85"/>
+  <text x="62" y="366" fill="#12345A" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="800">Gapura Mitra</text>
+  <text x="62" y="390" fill="#73818D" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700">Social Media Management</text>
+</svg>
