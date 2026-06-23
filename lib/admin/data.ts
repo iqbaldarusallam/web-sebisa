@@ -9,8 +9,10 @@ import type {
   AdminSnapshot,
   AdminTeamMember,
   AdminTestimonial,
+  AdminUser,
   CmsCollectionKey,
 } from "./types";
+import { hashAdminPassword } from "./password";
 import {
   hasSupabaseAdminEnv,
   supabaseDelete,
@@ -97,6 +99,15 @@ type SupabaseMessageRow = {
   email: string | null;
   message: string | null;
   status: AdminMessage["status"];
+  created_at: string;
+};
+
+type SupabaseAdminUserRow = {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  is_active: boolean;
   created_at: string;
 };
 
@@ -193,6 +204,17 @@ function toAdminMessage(row: SupabaseMessageRow): AdminMessage {
     email: row.email,
     message: row.message,
     status: row.status,
+    createdAt: row.created_at,
+  };
+}
+
+function toAdminUser(row: SupabaseAdminUserRow): AdminUser {
+  return {
+    id: row.id,
+    email: row.email,
+    name: row.name,
+    role: row.role,
+    isActive: row.is_active,
     createdAt: row.created_at,
   };
 }
@@ -342,5 +364,66 @@ export async function deleteCmsRecord(collection: CmsCollectionKey, id: string) 
   }
 
   await supabaseDelete(config.table, id);
+  return { persisted: true };
+}
+
+export async function getAdminUsers() {
+  if (!hasSupabaseAdminEnv()) {
+    return [];
+  }
+
+  const rows = await supabaseSelect<SupabaseAdminUserRow>(
+    "admin_users",
+    "select=id,email,name,role,is_active,created_at&order=created_at.asc",
+  );
+
+  return rows.map(toAdminUser);
+}
+
+export async function saveAdminUser(formData: FormData) {
+  if (!hasSupabaseAdminEnv()) {
+    return { persisted: false };
+  }
+
+  const id = readString(formData, "id");
+  const email = readString(formData, "email").toLowerCase();
+  const name = readString(formData, "name");
+  const role = readString(formData, "role") || "admin";
+  const password = readString(formData, "password");
+  const payload: Record<string, unknown> = {
+    email,
+    name,
+    role,
+    is_active: formData.get("isActive") === "on",
+    updated_at: new Date().toISOString(),
+  };
+
+  if (!email || !name) {
+    throw new Error("Email dan nama admin wajib diisi.");
+  }
+
+  if (password) {
+    payload.password_hash = hashAdminPassword(password);
+  }
+
+  if (id) {
+    await supabaseUpdate("admin_users", id, payload);
+  } else {
+    if (!password) {
+      throw new Error("Password admin baru wajib diisi.");
+    }
+
+    await supabaseInsert("admin_users", payload);
+  }
+
+  return { persisted: true };
+}
+
+export async function deleteAdminUser(id: string) {
+  if (!hasSupabaseAdminEnv()) {
+    return { persisted: false };
+  }
+
+  await supabaseDelete("admin_users", id);
   return { persisted: true };
 }

@@ -4,14 +4,16 @@ import Link from "next/link";
 import { HiArrowTopRightOnSquare, HiArrowRightOnRectangle } from "react-icons/hi2";
 
 export default function AdminShell({
+  adminRole,
   children,
 }: {
+  adminRole: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="min-h-screen bg-[#08111F] text-white">
       <div className="flex">
-        <AdminSidebar />
+        <AdminSidebar adminRole={adminRole} />
         <div className="min-w-0 flex-1">
           <header className="sticky top-0 z-30 border-b border-white/10 bg-[#08111F]/88 px-5 py-4 backdrop-blur-xl sm:px-7 lg:px-9">
             <div className="flex flex-wrap items-center justify-between gap-4">

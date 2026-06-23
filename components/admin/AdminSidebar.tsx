@@ -11,6 +11,7 @@ import {
   HiHome,
   HiMegaphone,
   HiSparkles,
+  HiShieldCheck,
   HiUsers,
 } from "react-icons/hi2";
 
@@ -23,10 +24,14 @@ const navItems = [
   { label: "Client / Kerjasama", href: "/admin/kerjasama", icon: HiSparkles },
   { label: "Transaksi", href: "/admin/transaksi", icon: HiCreditCard },
   { label: "Pesan Masuk", href: "/admin/pesan", icon: HiDocumentText },
+  { label: "Admin", href: "/admin/admins", icon: HiShieldCheck, superAdminOnly: true },
 ];
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ adminRole }: { adminRole: string }) {
   const pathname = usePathname();
+  const visibleNavItems = navItems.filter(
+    (item) => !item.superAdminOnly || adminRole === "super_admin",
+  );
 
   return (
     <aside className="hidden min-h-screen w-72 shrink-0 border-r border-white/10 bg-[#0B1224] px-5 py-6 text-white lg:block">
@@ -41,7 +46,7 @@ export default function AdminSidebar() {
       </Link>
 
       <nav className="mt-8 space-y-1">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const Icon = item.icon;
           const active =
             item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);

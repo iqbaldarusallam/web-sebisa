@@ -106,6 +106,15 @@ export type AdminMessage = {
   createdAt: string;
 };
 
+export type AdminUser = {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  isActive: boolean;
+  createdAt: string;
+};
+
 export type AdminSnapshot = {
   supabaseConfigured: boolean;
   services: AdminService[];

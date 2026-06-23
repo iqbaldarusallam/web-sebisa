@@ -45,7 +45,25 @@ export async function hasAdminSession() {
 }
 
 export async function requireAdminSession() {
-  if (!(await hasAdminSession())) {
+  const session = await getAdminSession();
+
+  if (!session) {
     redirect("/admin/login");
   }
+
+  return session;
+}
+
+export async function requireSuperAdminSession() {
+  const session = await getAdminSession();
+
+  if (!session) {
+    redirect("/admin/login");
+  }
+
+  if (session.role !== "super_admin") {
+    redirect("/admin");
+  }
+
+  return session;
 }

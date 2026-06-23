@@ -2,8 +2,13 @@
 
 import { signIn, signOut } from "@/auth";
 import { adminCollections } from "@/lib/admin/collections";
-import { requireAdminSession } from "@/lib/admin/auth";
-import { deleteCmsRecord, saveCmsRecord } from "@/lib/admin/data";
+import { requireAdminSession, requireSuperAdminSession } from "@/lib/admin/auth";
+import {
+  deleteAdminUser,
+  deleteCmsRecord,
+  saveAdminUser,
+  saveCmsRecord,
+} from "@/lib/admin/data";
 import type { CmsCollectionKey } from "@/lib/admin/types";
 import { AuthError } from "next-auth";
 import { revalidatePath } from "next/cache";
@@ -69,4 +74,26 @@ export async function deleteCmsItem(formData: FormData) {
 
   revalidatePath(path);
   redirect(`${path}?deleted=${result.persisted ? "1" : "demo"}`);
+}
+
+export async function saveAdminAccount(formData: FormData) {
+  await requireSuperAdminSession();
+  await saveAdminUser(formData);
+
+  revalidatePath("/admin/admins");
+  redirect("/admin/admins?saved=1");
+}
+
+export async function deleteAdminAccount(formData: FormData) {
+  const session = await requireSuperAdminSession();
+  const id = String(formData.get("id") ?? "");
+
+  if (!id || id === session.id) {
+    redirect("/admin/admins?error=self");
+  }
+
+  await deleteAdminUser(id);
+
+  revalidatePath("/admin/admins");
+  redirect("/admin/admins?deleted=1");
 }

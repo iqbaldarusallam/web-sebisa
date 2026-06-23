@@ -8,7 +8,7 @@ export default async function AdminPanelLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await requireAdminSession();
+  const session = await requireAdminSession();
 
-  return <AdminShell>{children}</AdminShell>;
+  return <AdminShell adminRole={session.role}>{children}</AdminShell>;
 }

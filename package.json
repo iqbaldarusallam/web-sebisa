@@ -7,8 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "create-admin": "node scripts/create-admin.mjs",
-    "seed:cms": "node scripts/seed-cms.mjs"
+    "supabase:migrate": "node scripts/supabase.mjs migrate",
+    "supabase:seed": "node scripts/supabase.mjs seed-cms",
+    "supabase:create-admin": "node scripts/supabase.mjs create-admin",
+    "supabase:reset-admin": "node scripts/supabase.mjs reset-admin"
   },
   "dependencies": {
     "@fontsource/plus-jakarta-sans": "^5.2.8",

@@ -21,14 +21,6 @@ function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
 }
 
-function getAdminEmail() {
-  return normalizeEmail(process.env.ADMIN_EMAIL ?? "");
-}
-
-function getAdminPassword() {
-  return process.env.ADMIN_PASSWORD?.trim() ?? "";
-}
-
 async function findAdminUser(email: string) {
   if (!hasSupabaseAdminEnv()) {
     return null;
@@ -65,26 +57,6 @@ export async function verifyAdminCredentials(
     }
   } catch (error) {
     console.error("Admin database login failed:", error);
-  }
-
-  if (process.env.NODE_ENV === "production") {
-    return null;
-  }
-
-  const envEmail = getAdminEmail();
-  const envPassword = getAdminPassword();
-  if (
-    envEmail &&
-    envPassword &&
-    normalizedEmail === envEmail &&
-    password === envPassword
-  ) {
-    return {
-      id: "env-admin",
-      email: envEmail,
-      name: "Admin Sebisa",
-      role: "super_admin",
-    };
   }
 
   return null;
