@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  HiCamera,
   HiChartBarSquare,
   HiChatBubbleLeftRight,
   HiCreditCard,
@@ -22,6 +23,7 @@ const navItems = [
   { label: "Testimoni", href: "/admin/testimoni", icon: HiChatBubbleLeftRight },
   { label: "Tim", href: "/admin/tim", icon: HiUsers },
   { label: "Client / Kerjasama", href: "/admin/kerjasama", icon: HiSparkles },
+  { label: "BTS", href: "/admin/bts", icon: HiCamera },
   { label: "Transaksi", href: "/admin/transaksi", icon: HiCreditCard },
   { label: "Pesan Masuk", href: "/admin/pesan", icon: HiDocumentText },
   { label: "Admin", href: "/admin/admins", icon: HiShieldCheck, superAdminOnly: true },

@@ -1,4 +1,5 @@
 import About from "@/components/About";
+import BTSSection from "@/components/BTSSection";
 import ClientLogos from "@/components/ClientLogos";
 import Contact from "@/components/Contact";
 import CTA from "@/components/CTA";
@@ -7,7 +8,6 @@ import Hero from "@/components/Hero";
 import Navbar from "@/components/Navbar";
 import Portfolio from "@/components/Portfolio";
 import Services from "@/components/Services";
-import Team from "@/components/Team";
 import Testimonials from "@/components/Testimonials";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import Workflow from "@/components/Workflow";
@@ -27,7 +27,7 @@ export default async function Home() {
       <Workflow />
       <Testimonials items={cms.testimonials} />
       <CTA />
-      <Team items={cms.team} />
+      <BTSSection items={cms.bts.slice(0, 4)} />
       <Portfolio items={cms.portfolio} />
       <Contact />
       <Footer />
