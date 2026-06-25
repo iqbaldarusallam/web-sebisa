@@ -12,7 +12,15 @@ import type { ServiceIcon } from "@/data/services";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
+export type BtsItem = {
+  title: string;
+  description: string;
+  videoUrl: string;
+  thumbnailUrl: string | null;
+};
+
 type PublicCmsContent = {
+  bts: BtsItem[];
   clients: ClientLogo[];
   services: Service[];
   portfolio: PortfolioItem[];
@@ -70,9 +78,46 @@ function serviceIconFromCategory(category: string | null): ServiceIcon {
     : "website";
 }
 
+function servicePriceValue(
+  cmsValue: number | null | undefined,
+  fallbackValue: number | undefined,
+  defaultValue: number,
+) {
+  const value = cmsValue ?? fallbackValue ?? defaultValue;
+
+  return Number.isFinite(value) && value > 0 ? value : defaultValue;
+}
+
+function serviceDurationFromCategory(category: ServiceIcon) {
+  const durations: Record<ServiceIcon, string> = {
+    ads: "Mulai 5-10 hari kerja",
+    landing: "Mulai 7-14 hari kerja",
+    social: "Mulai 14-30 hari kerja",
+    store: "Mulai 7-14 hari kerja",
+    video: "Mulai 7-21 hari kerja",
+    website: "Mulai 14-30 hari kerja",
+  };
+
+  return durations[category];
+}
+
+function serviceFeaturesFromText(value: string | null | undefined) {
+  return (value ?? "")
+    .split(/\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function normalizeBadgeType(value: string | null | undefined) {
+  return value === "popular" || value === "custom" || value === "discount"
+    ? value
+    : "discount";
+}
+
 export async function getPublicCmsContent(): Promise<PublicCmsContent> {
   if (!hasSupabasePublicEnv()) {
     return {
+      bts: [],
       clients: fallbackClients,
       services: fallbackServices,
       portfolio: fallbackPortfolio,
@@ -82,7 +127,16 @@ export async function getPublicCmsContent(): Promise<PublicCmsContent> {
   }
 
   try {
-    const [clients, services, portfolio, team, testimonials] = await Promise.all([
+    const [bts, clients, services, portfolio, team, testimonials] = await Promise.all([
+      publicSelect<{
+        title: string;
+        description: string;
+        video_url: string;
+        thumbnail_url: string | null;
+      }>(
+        "bts_items",
+        "select=title,description,video_url,thumbnail_url&is_published=eq.true&order=sort_order.asc",
+      ),
       publicSelect<{
         name: string;
         industry: string | null;
@@ -96,16 +150,25 @@ export async function getPublicCmsContent(): Promise<PublicCmsContent> {
         title: string;
         description: string;
         category: string | null;
-        base_price: number | null;
-      }>("services", "select=title,description,category,base_price&is_published=eq.true&order=sort_order.asc"),
+        promo_price: number | null;
+        normal_price?: number | null;
+        features?: string | null;
+        duration?: string | null;
+        badge_type?: string | null;
+        badge_text?: string | null;
+      }>(
+        "services",
+        "select=*&is_published=eq.true&order=sort_order.asc",
+      ),
       publicSelect<{
         name: string;
         category: string;
         description: string;
         image_url: string | null;
+        is_featured: boolean;
       }>(
         "portfolio_items",
-        "select=name,category,description,image_url&is_published=eq.true&order=sort_order.asc",
+        "select=name,category,description,image_url,is_featured&is_published=eq.true&order=sort_order.asc",
       ),
       publicSelect<{
         name: string;
@@ -128,6 +191,15 @@ export async function getPublicCmsContent(): Promise<PublicCmsContent> {
     ]);
 
     return {
+      bts:
+        bts.length > 0
+          ? bts.map((item) => ({
+              title: item.title,
+              description: item.description,
+              videoUrl: item.video_url,
+              thumbnailUrl: item.thumbnail_url,
+            }))
+          : [],
       clients:
         clients.length > 0
           ? clients.map((client) => ({
@@ -141,15 +213,40 @@ export async function getPublicCmsContent(): Promise<PublicCmsContent> {
         services.length > 0
           ? services.map((service) => {
               const fallbackService = getServiceByTitle(service.title);
-              const price = service.base_price ?? fallbackService?.price ?? 1500000;
+              const price = servicePriceValue(
+                service.promo_price,
+                fallbackService?.price,
+                1500000,
+              );
+              const rawCompareAtPrice = servicePriceValue(
+                service.normal_price,
+                fallbackService?.compareAtPrice,
+                Math.ceil(price * 1.65),
+              );
+              const compareAtPrice =
+                rawCompareAtPrice > price ? rawCompareAtPrice : price;
+              const icon = serviceIconFromCategory(service.category);
+              const badgeType = normalizeBadgeType(
+                service.badge_type ?? fallbackService?.badgeType,
+              );
 
               return {
                 title: service.title,
                 description: service.description,
-                icon: serviceIconFromCategory(service.category),
+                icon,
                 price,
-                compareAtPrice:
-                  fallbackService?.compareAtPrice ?? Math.ceil(price * 1.65),
+                compareAtPrice,
+                features:
+                  serviceFeaturesFromText(service.features).length > 0
+                    ? serviceFeaturesFromText(service.features)
+                    : fallbackService?.features,
+                durationLabel:
+                  service.duration ??
+                  fallbackService?.durationLabel ??
+                  serviceDurationFromCategory(icon),
+                badgeType,
+                badgeLabel: service.badge_text ?? fallbackService?.badgeLabel ?? null,
+                isPopular: badgeType === "popular",
               };
             })
           : fallbackServices,
@@ -162,6 +259,7 @@ export async function getPublicCmsContent(): Promise<PublicCmsContent> {
               description: item.description,
               colors: ["#06B6D4", "#141D38", "#22C55E", "#E0F2FE", "#0891B2", "#64748B"],
               image: item.image_url,
+              isFeatured: item.is_featured,
             }))
           : fallbackPortfolio,
       team:
@@ -188,6 +286,7 @@ export async function getPublicCmsContent(): Promise<PublicCmsContent> {
     };
   } catch {
     return {
+      bts: [],
       clients: fallbackClients,
       services: fallbackServices,
       portfolio: fallbackPortfolio,

@@ -11,14 +11,17 @@ import type {
   AdminTestimonial,
   AdminUser,
   CmsCollectionKey,
+  ServiceBadgeType,
+  AdminBtsItem,
 } from "./types";
-import { hashAdminPassword } from "./password";
+import { hashAdminPassword, verifyAdminPasswordHash } from "./password";
 import {
   hasSupabaseAdminEnv,
   supabaseDelete,
   supabaseInsert,
   supabaseSelect,
   supabaseUpdate,
+  supabaseUpdateWhere,
 } from "@/lib/integrations/supabase-rest";
 
 type SupabaseServiceRow = {
@@ -26,7 +29,12 @@ type SupabaseServiceRow = {
   title: string;
   description: string;
   category: string | null;
-  base_price: number | null;
+  promo_price: number | null;
+  normal_price: number | null;
+  features: string | null;
+  duration: string | null;
+  badge_type: string | null;
+  badge_text: string | null;
   is_published: boolean;
   sort_order: number;
 };
@@ -37,7 +45,6 @@ type SupabasePortfolioRow = {
   category: string;
   description: string;
   image_url: string | null;
-  project_url: string | null;
   is_featured: boolean;
   is_published: boolean;
   sort_order: number;
@@ -74,6 +81,17 @@ type SupabaseClientRow = {
   sort_order: number;
 };
 
+
+type SupabaseBtsRow = {
+  id: string;
+  title: string;
+  description: string;
+  video_url: string;
+  thumbnail_url: string | null;
+  is_published: boolean;
+  sort_order: number;
+};
+
 type SupabaseOrderRow = {
   id: string;
   order_code: string;
@@ -106,6 +124,7 @@ type SupabaseAdminUserRow = {
   id: string;
   email: string;
   name: string;
+  password_hash?: string;
   role: string;
   is_active: boolean;
   created_at: string;
@@ -113,13 +132,59 @@ type SupabaseAdminUserRow = {
 
 const orderQuery = "select=*&order=sort_order.asc";
 
+function normalizeBadgeType(value: string | null | undefined): ServiceBadgeType {
+  return value === "popular" || value === "custom" || value === "discount"
+    ? value
+    : "discount";
+}
+
+function getServiceBadgeDisplay(
+  type: ServiceBadgeType,
+  text: string | null,
+  normalPrice: number | null,
+  promoPrice: number | null,
+) {
+  if (type === "popular") {
+    return "Popular";
+  }
+
+  if (type === "custom") {
+    return text || "Isi sendiri";
+  }
+
+  if (
+    typeof normalPrice === "number" &&
+    typeof promoPrice === "number" &&
+    normalPrice > promoPrice &&
+    promoPrice > 0
+  ) {
+    const discount = Math.round(((normalPrice - promoPrice) / normalPrice) * 100);
+    return `Hemat ${discount}%`;
+  }
+
+  return "Hemat otomatis";
+}
+
 function toAdminService(row: SupabaseServiceRow): AdminService {
+  const badgeType = normalizeBadgeType(row.badge_type);
+
   return {
     id: row.id,
     title: row.title,
     description: row.description,
     category: row.category ?? "Digital",
-    basePrice: row.base_price,
+    promoPrice: row.promo_price,
+    normalPrice: row.normal_price ?? null,
+    features: row.features ?? "",
+    duration: row.duration,
+    badgeType,
+    badgeText: row.badge_text,
+    badgeDisplay: getServiceBadgeDisplay(
+      badgeType,
+      row.badge_text,
+      row.normal_price,
+      row.promo_price,
+    ),
     isPublished: row.is_published,
     sortOrder: row.sort_order,
   };
@@ -132,7 +197,6 @@ function toAdminPortfolio(row: SupabasePortfolioRow): AdminPortfolioItem {
     category: row.category,
     description: row.description,
     imageUrl: row.image_url ?? "",
-    projectUrl: row.project_url,
     isFeatured: row.is_featured,
     isPublished: row.is_published,
     sortOrder: row.sort_order,
@@ -171,6 +235,19 @@ function toAdminClient(row: SupabaseClientRow): AdminClientLogo {
     industry: row.industry,
     logoUrl: row.logo_url,
     websiteUrl: row.website_url,
+    isPublished: row.is_published,
+    sortOrder: row.sort_order,
+  };
+}
+
+
+function toAdminBts(row: SupabaseBtsRow): AdminBtsItem {
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    videoUrl: row.video_url,
+    thumbnailUrl: row.thumbnail_url,
     isPublished: row.is_published,
     sortOrder: row.sort_order,
   };
@@ -231,6 +308,7 @@ export async function getAdminSnapshot(): Promise<AdminSnapshot> {
       testimonials,
       team,
       clients,
+      bts,
       orders,
       messages,
     ] = await Promise.all([
@@ -239,6 +317,7 @@ export async function getAdminSnapshot(): Promise<AdminSnapshot> {
       supabaseSelect<SupabaseTestimonialRow>("testimonials", orderQuery),
       supabaseSelect<SupabaseTeamRow>("team_members", orderQuery),
       supabaseSelect<SupabaseClientRow>("client_logos", orderQuery),
+      supabaseSelect<SupabaseBtsRow>("bts_items", orderQuery),
       supabaseSelect<SupabaseOrderRow>("orders", "select=*&order=created_at.desc&limit=50"),
       supabaseSelect<SupabaseMessageRow>("contact_messages", "select=*&order=created_at.desc&limit=50"),
     ]);
@@ -250,6 +329,7 @@ export async function getAdminSnapshot(): Promise<AdminSnapshot> {
       testimonials: testimonials.map(toAdminTestimonial),
       team: team.map(toAdminTeam),
       clients: clients.map(toAdminClient),
+      bts: bts.map(toAdminBts),
       orders: orders.map(toAdminOrder),
       messages: messages.map(toAdminMessage),
     };
@@ -274,6 +354,17 @@ function readNumber(formData: FormData, key: string, fallback = 0) {
   return Number.isFinite(value) ? value : fallback;
 }
 
+function readSelectOrCustom(formData: FormData, key: string, customKey: string) {
+  const customValue = readString(formData, customKey);
+  const selectedValue = readString(formData, key);
+
+  if (customValue) {
+    return customValue;
+  }
+
+  return selectedValue === "__custom__" ? "" : selectedValue;
+}
+
 export function buildPayload(collection: CmsCollectionKey, formData: FormData) {
   switch (collection) {
     case "services":
@@ -281,17 +372,26 @@ export function buildPayload(collection: CmsCollectionKey, formData: FormData) {
         title: readString(formData, "title"),
         description: readString(formData, "description"),
         category: readString(formData, "category") || null,
-        base_price: readString(formData, "basePrice") ? readNumber(formData, "basePrice") : null,
+        promo_price: readString(formData, "promoPrice") ? readNumber(formData, "promoPrice") : null,
+        normal_price: readString(formData, "normalPrice")
+          ? readNumber(formData, "normalPrice")
+          : null,
+        features: readNullableString(formData, "features"),
+        duration: readNullableString(formData, "duration"),
+        badge_type: normalizeBadgeType(readString(formData, "badgeType")),
+        badge_text:
+          readString(formData, "badgeType") === "custom"
+            ? readNullableString(formData, "badgeText")
+            : null,
         is_published: formData.get("isPublished") === "on",
         sort_order: readNumber(formData, "sortOrder", 999),
       };
     case "portfolio":
       return {
         name: readString(formData, "name"),
-        category: readString(formData, "category"),
+        category: readSelectOrCustom(formData, "category", "customCategory"),
         description: readString(formData, "description"),
         image_url: readNullableString(formData, "imageUrl"),
-        project_url: readNullableString(formData, "projectUrl"),
         is_featured: formData.get("isFeatured") === "on",
         is_published: true,
         sort_order: readNumber(formData, "sortOrder", 999),
@@ -324,6 +424,16 @@ export function buildPayload(collection: CmsCollectionKey, formData: FormData) {
         is_published: true,
         sort_order: readNumber(formData, "sortOrder", 999),
       };
+    case "bts":
+      return {
+        title: readString(formData, "title"),
+        description: readString(formData, "description"),
+        video_url: readString(formData, "videoUrl"),
+        thumbnail_url: readNullableString(formData, "thumbnailUrl"),
+        is_published: formData.get("isPublished") === "on",
+        sort_order: readNumber(formData, "sortOrder", 999),
+      };
+
     case "messages":
       return {
         name: readString(formData, "name"),
@@ -337,15 +447,44 @@ export function buildPayload(collection: CmsCollectionKey, formData: FormData) {
   }
 }
 
+
+export function getBtsItems() {
+  return getAdminSnapshot().then((snapshot) => snapshot.bts);
+}
+
+export function isSupabaseConfigured() {
+  return hasSupabaseAdminEnv();
+}
+
 export async function saveCmsRecord(collection: CmsCollectionKey, formData: FormData) {
   const config = adminCollections[collection];
   const payload = buildPayload(collection, formData);
+  const id = readString(formData, "id");
 
   if (!hasSupabaseAdminEnv()) {
-    return { persisted: false };
+    return { persisted: false, status: "demo" };
   }
 
-  const id = readString(formData, "id");
+  if (!id && config.maxItems) {
+    const rows = await supabaseSelect<{ id: string }>(config.table, "select=id");
+
+    if (rows.length >= config.maxItems) {
+      return { persisted: false, status: "limit" };
+    }
+  }
+
+  if (
+    collection === "services" &&
+    payload.badge_type === "popular" &&
+    typeof payload.category === "string" &&
+    payload.category
+  ) {
+    await supabaseUpdateWhere(config.table, "category", payload.category, {
+      badge_type: "discount",
+      badge_text: null,
+      updated_at: new Date().toISOString(),
+    });
+  }
 
   if (id) {
     await supabaseUpdate(config.table, id, payload);
@@ -353,7 +492,7 @@ export async function saveCmsRecord(collection: CmsCollectionKey, formData: Form
     await supabaseInsert(config.table, payload);
   }
 
-  return { persisted: true };
+  return { persisted: true, status: "saved" };
 }
 
 export async function deleteCmsRecord(collection: CmsCollectionKey, id: string) {
@@ -380,50 +519,120 @@ export async function getAdminUsers() {
   return rows.map(toAdminUser);
 }
 
-export async function saveAdminUser(formData: FormData) {
+async function getAdminUserRow(id: string) {
+  const rows = await supabaseSelect<SupabaseAdminUserRow>(
+    "admin_users",
+    `select=id,email,name,role,is_active,created_at,password_hash&id=eq.${encodeURIComponent(id)}&limit=1`,
+  );
+
+  return rows[0] ?? null;
+}
+
+export async function saveAdminUser(
+  formData: FormData,
+  options: { currentAdminId?: string } = {},
+) {
   if (!hasSupabaseAdminEnv()) {
-    return { persisted: false };
+    return { persisted: false, status: "demo" };
   }
 
   const id = readString(formData, "id");
   const email = readString(formData, "email").toLowerCase();
   const name = readString(formData, "name");
-  const role = readString(formData, "role") || "admin";
   const password = readString(formData, "password");
   const payload: Record<string, unknown> = {
     email,
     name,
-    role,
+    role: "admin",
     is_active: formData.get("isActive") === "on",
     updated_at: new Date().toISOString(),
   };
 
   if (!email || !name) {
-    throw new Error("Email dan nama admin wajib diisi.");
-  }
-
-  if (password) {
-    payload.password_hash = hashAdminPassword(password);
+    return { persisted: false, status: "invalid" };
   }
 
   if (id) {
+    if (id === options.currentAdminId) {
+      return { persisted: false, status: "protected" };
+    }
+
+    const existing = await getAdminUserRow(id);
+
+    if (!existing || existing.role === "super_admin") {
+      return { persisted: false, status: "protected" };
+    }
+
     await supabaseUpdate("admin_users", id, payload);
   } else {
     if (!password) {
-      throw new Error("Password admin baru wajib diisi.");
+      return { persisted: false, status: "password-required" };
     }
 
+    payload.password_hash = hashAdminPassword(password);
     await supabaseInsert("admin_users", payload);
   }
 
-  return { persisted: true };
+  return { persisted: true, status: "saved" };
 }
 
-export async function deleteAdminUser(id: string) {
+export async function deleteAdminUser(
+  id: string,
+  options: { currentAdminId?: string } = {},
+) {
   if (!hasSupabaseAdminEnv()) {
-    return { persisted: false };
+    return { persisted: false, status: "demo" };
+  }
+
+  if (id === options.currentAdminId) {
+    return { persisted: false, status: "protected" };
+  }
+
+  const existing = await getAdminUserRow(id);
+
+  if (!existing || existing.role === "super_admin") {
+    return { persisted: false, status: "protected" };
   }
 
   await supabaseDelete("admin_users", id);
-  return { persisted: true };
+  return { persisted: true, status: "deleted" };
+}
+
+export async function changeOwnAdminPassword(adminId: string, formData: FormData) {
+  if (!hasSupabaseAdminEnv()) {
+    return { persisted: false, status: "demo" };
+  }
+
+  const currentPassword = readString(formData, "currentPassword");
+  const newPassword = readString(formData, "newPassword");
+  const confirmPassword = readString(formData, "confirmPassword");
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return { persisted: false, status: "invalid" };
+  }
+
+  if (newPassword.length < 8) {
+    return { persisted: false, status: "short" };
+  }
+
+  if (newPassword !== confirmPassword) {
+    return { persisted: false, status: "mismatch" };
+  }
+
+  const admin = await getAdminUserRow(adminId);
+
+  if (!admin?.password_hash || !admin.is_active) {
+    return { persisted: false, status: "invalid" };
+  }
+
+  if (!verifyAdminPasswordHash(currentPassword, admin.password_hash)) {
+    return { persisted: false, status: "current" };
+  }
+
+  await supabaseUpdate("admin_users", adminId, {
+    password_hash: hashAdminPassword(newPassword),
+    updated_at: new Date().toISOString(),
+  });
+
+  return { persisted: true, status: "saved" };
 }

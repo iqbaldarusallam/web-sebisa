@@ -7,7 +7,8 @@ export type AdminFieldType =
   | "url"
   | "email"
   | "checkbox"
-  | "select";
+  | "select"
+  | "badge";
 
 export type AdminField = {
   name: string;
@@ -16,6 +17,12 @@ export type AdminField = {
   placeholder?: string;
   required?: boolean;
   options?: string[];
+  allowCustom?: boolean;
+  customFieldName?: string;
+  customPlaceholder?: string;
+  accept?: string;
+  uploadKind?: "image" | "video" | "media";
+  uploadLabel?: string;
 };
 
 export type AdminColumn = {
@@ -31,6 +38,7 @@ export type AdminCollectionConfig = {
   table: string;
   path: string;
   badge: string;
+  maxItems?: number;
   fields: AdminField[];
   columns: AdminColumn[];
 };
@@ -52,7 +60,32 @@ export const adminCollections: Record<CmsCollectionKey, AdminCollectionConfig> =
         type: "select",
         options: ["social", "video", "ads", "website", "landing", "store"],
       },
-      { name: "basePrice", label: "Harga promo", type: "number", placeholder: "1500000" },
+      {
+        name: "normalPrice",
+        label: "Harga normal (dicoret)",
+        type: "number",
+        placeholder: "2500000",
+      },
+      { name: "promoPrice", label: "Harga promo", type: "number", placeholder: "1500000" },
+      {
+        name: "badgeType",
+        label: "Badge",
+        type: "badge",
+        options: ["discount", "popular", "custom"],
+        customPlaceholder: "Contoh: Best Value, Limited, Paket Favorit",
+      },
+      {
+        name: "duration",
+        label: "Durasi pengerjaan",
+        type: "text",
+        placeholder: "Mulai 7-14 hari kerja",
+      },
+      {
+        name: "features",
+        label: "Fitur layanan",
+        type: "textarea",
+        placeholder: "Satu fitur per baris",
+      },
       { name: "description", label: "Deskripsi", type: "textarea", required: true },
       { name: "sortOrder", label: "Urutan tampil", type: "number", placeholder: "1" },
       { name: "isPublished", label: "Aktif", type: "checkbox" },
@@ -60,8 +93,10 @@ export const adminCollections: Record<CmsCollectionKey, AdminCollectionConfig> =
     columns: [
       { key: "title", label: "Layanan" },
       { key: "category", label: "Kategori" },
-      { key: "description", label: "Deskripsi" },
-      { key: "basePrice", label: "Harga", type: "money" },
+      { key: "normalPrice", label: "Harga normal", type: "money" },
+      { key: "promoPrice", label: "Harga promo", type: "money" },
+      { key: "badgeDisplay", label: "Badge" },
+      { key: "duration", label: "Durasi" },
       { key: "sortOrder", label: "Urutan" },
       { key: "isPublished", label: "Aktif", type: "boolean" },
     ],
@@ -76,9 +111,24 @@ export const adminCollections: Record<CmsCollectionKey, AdminCollectionConfig> =
     badge: "CMS Karya",
     fields: [
       { name: "name", label: "Nama project", type: "text", required: true },
-      { name: "category", label: "Kategori", type: "text", required: true },
+      {
+        name: "category",
+        label: "Kategori",
+        type: "select",
+        required: true,
+        allowCustom: true,
+        customFieldName: "customCategory",
+        customPlaceholder: "Atau isi kategori baru, contoh: Podcast Artist",
+        options: [
+          "Social Media",
+          "Graphic Design",
+          "Website & Landing Page",
+          "Marketplace",
+          "Branding",
+          "Digital Campaign",
+        ],
+      },
       { name: "imageUrl", label: "Gambar portfolio", type: "url" },
-      { name: "projectUrl", label: "Link project", type: "url" },
       { name: "description", label: "Deskripsi", type: "textarea", required: true },
       { name: "sortOrder", label: "Urutan tampil", type: "number" },
       { name: "isFeatured", label: "Featured", type: "checkbox" },
@@ -88,7 +138,6 @@ export const adminCollections: Record<CmsCollectionKey, AdminCollectionConfig> =
       { key: "name", label: "Project" },
       { key: "category", label: "Kategori" },
       { key: "description", label: "Deskripsi" },
-      { key: "projectUrl", label: "Link", type: "url" },
       { key: "isFeatured", label: "Featured", type: "boolean" },
     ],
   },
@@ -164,6 +213,48 @@ export const adminCollections: Record<CmsCollectionKey, AdminCollectionConfig> =
       { key: "industry", label: "Industri" },
       { key: "websiteUrl", label: "Link", type: "url" },
       { key: "sortOrder", label: "Urutan" },
+    ],
+  },
+  bts: {
+    key: "bts",
+    title: "Behind The Scenes",
+    description:
+      "Kelola konten BTS berupa video proses kerja yang tampil di homepage dan halaman BTS.",
+    table: "bts_items",
+    path: "/admin/bts",
+    badge: "CMS BTS",
+    maxItems: 6,
+    fields: [
+      { name: "title", label: "Judul video", type: "text", required: true },
+      { name: "description", label: "Deskripsi singkat", type: "textarea", required: true },
+      {
+        name: "videoUrl",
+        label: "Video",
+        type: "url",
+        required: true,
+        placeholder: "https://res.cloudinary.com/.../video.mp4",
+        accept: "video/mp4,video/webm,video/quicktime",
+        uploadKind: "video",
+        uploadLabel: "Upload Video",
+      },
+      {
+        name: "thumbnailUrl",
+        label: "Thumbnail",
+        type: "url",
+        placeholder: "https://res.cloudinary.com/.../thumb.jpg",
+        uploadKind: "image",
+        uploadLabel: "Upload Thumbnail",
+      },
+      { name: "sortOrder", label: "Urutan tampil", type: "number", placeholder: "1" },
+      { name: "isPublished", label: "Aktif", type: "checkbox" },
+    ],
+    columns: [
+      { key: "thumbnailUrl", label: "Thumbnail", type: "image" },
+      { key: "title", label: "Judul" },
+      { key: "description", label: "Deskripsi" },
+      { key: "videoUrl", label: "Video", type: "url" },
+      { key: "sortOrder", label: "Urutan" },
+      { key: "isPublished", label: "Aktif", type: "boolean" },
     ],
   },
   messages: {

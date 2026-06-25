@@ -12,11 +12,12 @@ export type PortfolioCategory = (typeof portfolioCategories)[number];
 
 export type PortfolioItem = {
   name: string;
-  category: Exclude<PortfolioCategory, "Semua">;
-  filterCategory: Exclude<PortfolioCategory, "Semua">;
+  category: string;
+  filterCategory: string;
   description: string;
   colors: string[];
   image: string | null;
+  isFeatured?: boolean;
 };
 
 export const portfolioItems: PortfolioItem[] = [

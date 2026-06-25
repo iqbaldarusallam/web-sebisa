@@ -5,6 +5,7 @@ import { teamMembers } from "@/data/team";
 import { testimonials } from "@/data/testimonials";
 import type {
   AdminClientLogo,
+  AdminBtsItem,
   AdminMessage,
   AdminOrder,
   AdminPortfolioItem,
@@ -21,7 +22,18 @@ export const mockServices: AdminService[] = services.map((service, index) => ({
   title: service.title,
   description: service.description,
   category: service.icon,
-  basePrice: service.price,
+  promoPrice: service.price,
+  normalPrice: service.compareAtPrice,
+  features: service.features?.join("\n") ?? "",
+  duration: service.durationLabel ?? null,
+  badgeType: service.badgeType ?? (service.isPopular ? "popular" : "discount"),
+  badgeText: service.badgeLabel ?? null,
+  badgeDisplay:
+    service.badgeType === "custom" && service.badgeLabel
+      ? service.badgeLabel
+      : service.isPopular
+        ? "Popular"
+        : "Hemat otomatis",
   isPublished: true,
   sortOrder: index + 1,
 }));
@@ -32,7 +44,6 @@ export const mockPortfolio: AdminPortfolioItem[] = portfolioItems.map((item, ind
   category: item.category,
   description: item.description,
   imageUrl: item.image ?? "",
-  projectUrl: null,
   isFeatured: index < 4,
   isPublished: true,
   sortOrder: index + 1,
@@ -43,7 +54,7 @@ export const mockTestimonials: AdminTestimonial[] = testimonials.map((item, inde
   name: item.name,
   role: item.role,
   comment: item.comment,
-  rating: [4.8, 4.7, 4.9][index] ?? 4.8,
+  rating: item.rating ?? [4.8, 4.7, 4.9][index] ?? 4.8,
   isPublished: true,
   sortOrder: index + 1,
 }));
@@ -142,6 +153,64 @@ export const mockMessages: AdminMessage[] = [
   },
 ];
 
+
+export const mockBts: AdminBtsItem[] = [
+  {
+    id: "bts-1",
+    title: "Proses Shooting Brand Kedai Rasa",
+    description: "Behind the scenes proses produksi video brand Kedai Rasa dari konsep sampai editing final.",
+    videoUrl: "https://res.cloudinary.com/dseqmekig/video/upload/v1/sebisa/bts/sample-1.mp4",
+    thumbnailUrl: null,
+    isPublished: true,
+    sortOrder: 1,
+  },
+  {
+    id: "bts-2",
+    title: "Setup Foto Produk Herbal Glow",
+    description: "Dokumentasi proses foto produk untuk katalog dan marketplace client.",
+    videoUrl: "https://res.cloudinary.com/dseqmekig/video/upload/v1/sebisa/bts/sample-2.mp4",
+    thumbnailUrl: null,
+    isPublished: true,
+    sortOrder: 2,
+  },
+  {
+    id: "bts-3",
+    title: "Editing Konten Social Media",
+    description: "Proses editing konten Instagram dan TikTok untuk campaign bulanan.",
+    videoUrl: "https://res.cloudinary.com/dseqmekig/video/upload/v1/sebisa/bts/sample-3.mp4",
+    thumbnailUrl: null,
+    isPublished: true,
+    sortOrder: 3,
+  },
+  {
+    id: "bts-4",
+    title: "Brainstorming Strategi Digital",
+    description: "Sesi diskusi tim untuk menyusun strategi digital client baru.",
+    videoUrl: "https://res.cloudinary.com/dseqmekig/video/upload/v1/sebisa/bts/sample-4.mp4",
+    thumbnailUrl: null,
+    isPublished: true,
+    sortOrder: 4,
+  },
+  {
+    id: "bts-5",
+    title: "Review Hasil Konten Client",
+    description: "Tim mengecek detail visual, caption, dan format konten sebelum diserahkan ke client.",
+    videoUrl: "https://res.cloudinary.com/dseqmekig/video/upload/v1/sebisa/bts/sample-5.mp4",
+    thumbnailUrl: null,
+    isPublished: true,
+    sortOrder: 5,
+  },
+  {
+    id: "bts-6",
+    title: "Produksi Konten Campaign",
+    description: "Cuplikan proses produksi aset campaign mulai dari arahan kreatif sampai finalisasi publikasi.",
+    videoUrl: "https://res.cloudinary.com/dseqmekig/video/upload/v1/sebisa/bts/sample-6.mp4",
+    thumbnailUrl: null,
+    isPublished: true,
+    sortOrder: 6,
+  },
+];
+
 export const mockAdminSnapshot: AdminSnapshot = {
   supabaseConfigured: false,
   services: mockServices,
@@ -149,6 +218,7 @@ export const mockAdminSnapshot: AdminSnapshot = {
   testimonials: mockTestimonials,
   team: mockTeam,
   clients: mockClients,
+  bts: mockBts,
   orders: mockOrders,
   messages: mockMessages,
 };

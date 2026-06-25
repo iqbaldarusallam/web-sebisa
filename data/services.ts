@@ -12,6 +12,11 @@ export type Service = {
   icon: ServiceIcon;
   price: number;
   compareAtPrice: number;
+  features?: string[];
+  durationLabel?: string;
+  badgeType?: "discount" | "popular" | "custom";
+  badgeLabel?: string | null;
+  isPopular?: boolean;
 };
 
 export const services: Service[] = [
