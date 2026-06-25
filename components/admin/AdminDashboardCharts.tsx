@@ -90,9 +90,10 @@ export default function AdminDashboardCharts({
       </div>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <div className="h-72 rounded-2xl border border-white/10 bg-[#08111F]/45 p-4">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={activity} margin={{ left: -18, right: 8, top: 8, bottom: 0 }}>
+        <div className="min-w-0 rounded-2xl border border-white/10 bg-[#08111F]/45 p-4">
+          <div className="h-64 min-w-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={activity} margin={{ left: -18, right: 8, top: 8, bottom: 0 }}>
               <defs>
                 <linearGradient id="leadsGradient" x1="0" x2="0" y1="0" y2="1">
                   <stop offset="0%" stopColor="#20C4E8" stopOpacity={0.34} />
@@ -135,19 +136,21 @@ export default function AdminDashboardCharts({
                 fill="url(#ordersGradient)"
                 activeDot={{ r: 5 }}
               />
-            </AreaChart>
-          </ResponsiveContainer>
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
-        <div className="h-72 rounded-2xl border border-white/10 bg-[#08111F]/45 p-4">
+        <div className="min-w-0 rounded-2xl border border-white/10 bg-[#08111F]/45 p-4">
           <div className="mb-3 flex items-center justify-between">
             <p className="text-sm font-black text-white">Total Konten</p>
             <p className="text-xs font-bold text-white/45">
               {content.reduce((total, item) => total + item.value, 0)} item
             </p>
           </div>
-          <ResponsiveContainer width="100%" height="82%">
-            <BarChart data={content} layout="vertical" margin={{ left: 8, right: 12, top: 4, bottom: 4 }}>
+          <div className="h-56 min-w-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={content} layout="vertical" margin={{ left: 8, right: 12, top: 4, bottom: 4 }}>
               <CartesianGrid stroke="rgba(255,255,255,0.07)" horizontal={false} />
               <XAxis
                 type="number"
@@ -166,8 +169,9 @@ export default function AdminDashboardCharts({
               />
               <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
               <Bar dataKey="value" name="Data" fill="#20C4E8" radius={[0, 8, 8, 0]} barSize={18} />
-            </BarChart>
-          </ResponsiveContainer>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
     </div>

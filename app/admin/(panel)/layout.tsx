@@ -10,5 +10,5 @@ export default async function AdminPanelLayout({
 }) {
   const session = await requireAdminSession();
 
-  return <AdminShell adminRole={session.role}>{children}</AdminShell>;
+  return <AdminShell admin={session}>{children}</AdminShell>;
 }
