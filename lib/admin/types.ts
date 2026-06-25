@@ -4,7 +4,8 @@ export type CmsCollectionKey =
   | "testimonials"
   | "team"
   | "clients"
-  | "messages";
+  | "messages"
+  | "bts";
 
 export type PaymentStatus =
   | "pending"
@@ -25,12 +26,20 @@ export type OrderStatus =
   | "cancelled"
   | "follow_up";
 
+export type ServiceBadgeType = "discount" | "popular" | "custom";
+
 export type AdminService = {
   id: string;
   title: string;
   description: string;
   category: string;
-  basePrice: number | null;
+  promoPrice: number | null;
+  normalPrice: number | null;
+  features: string;
+  duration: string | null;
+  badgeType: ServiceBadgeType;
+  badgeText: string | null;
+  badgeDisplay: string;
   isPublished: boolean;
   sortOrder: number;
 };
@@ -41,7 +50,6 @@ export type AdminPortfolioItem = {
   category: string;
   description: string;
   imageUrl: string;
-  projectUrl: string | null;
   isFeatured: boolean;
   isPublished: boolean;
   sortOrder: number;
@@ -74,6 +82,16 @@ export type AdminClientLogo = {
   industry: string | null;
   logoUrl: string | null;
   websiteUrl: string | null;
+  isPublished: boolean;
+  sortOrder: number;
+};
+
+export type AdminBtsItem = {
+  id: string;
+  title: string;
+  description: string;
+  videoUrl: string;
+  thumbnailUrl: string | null;
   isPublished: boolean;
   sortOrder: number;
 };
@@ -122,6 +140,7 @@ export type AdminSnapshot = {
   testimonials: AdminTestimonial[];
   team: AdminTeamMember[];
   clients: AdminClientLogo[];
+  bts: AdminBtsItem[];
   orders: AdminOrder[];
   messages: AdminMessage[];
 };
@@ -132,4 +151,5 @@ export type AdminCollectionRow =
   | AdminTestimonial
   | AdminTeamMember
   | AdminClientLogo
+  | AdminBtsItem
   | AdminMessage;
