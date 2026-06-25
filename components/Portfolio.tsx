@@ -3,20 +3,20 @@
 import { portfolioItems, type PortfolioItem } from "@/data/portfolio";
 import Image from "next/image";
 import {
-  HiArrowTopRightOnSquare,
   HiChevronLeft,
   HiChevronRight,
+  HiMagnifyingGlassPlus,
 } from "react-icons/hi2";
+import { useState } from "react";
 import MotionReveal from "./MotionReveal";
 import CountUpValue from "./CountUpValue";
 import { useScrollSlider } from "./useScrollSlider";
+import PortfolioLightbox from "./PortfolioLightbox";
 
 export default function Portfolio({ items = portfolioItems }: { items?: PortfolioItem[] }) {
-  const featuredItems = [
-    items[3],
-    items[0],
-    items[2],
-  ].filter((item): item is PortfolioItem => Boolean(item));
+  const cmsFeaturedItems = items.filter((item) => item.isFeatured);
+  const featuredItems = (cmsFeaturedItems.length > 0 ? cmsFeaturedItems : items).slice(0, 3);
+  const [activeItem, setActiveItem] = useState<PortfolioItem | null>(null);
   const {
     canScrollNext,
     canScrollPrev,
@@ -66,7 +66,7 @@ export default function Portfolio({ items = portfolioItems }: { items?: Portfoli
                     Recent Work
                   </h3>
 
-                  <div className="mt-3 aspect-[1.48/1] w-full overflow-hidden rounded-lg bg-white p-2">
+                  <div className="mt-3 w-full overflow-hidden rounded-lg bg-white p-2">
                     {item.image ? (
                       <Image
                         src={item.image}
@@ -74,10 +74,10 @@ export default function Portfolio({ items = portfolioItems }: { items?: Portfoli
                         width={620}
                         height={430}
                         unoptimized
-                        className="h-full w-full object-contain transition duration-300"
+                        className="h-auto w-full object-contain transition duration-300"
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center rounded-md bg-[#EAF8FF] px-4 text-center text-xs font-extrabold leading-5 text-[#12345A]/55">
+                      <div className="flex aspect-[620/430] w-full items-center justify-center rounded-md bg-[#EAF8FF] px-4 text-center text-xs font-extrabold leading-5 text-[#12345A]/55">
                         Gambar dari CMS
                       </div>
                     )}
@@ -90,13 +90,14 @@ export default function Portfolio({ items = portfolioItems }: { items?: Portfoli
                     <p className="mt-2 line-clamp-2 text-[0.72rem] font-medium leading-5 text-[#7B8894] sm:text-xs">
                       {item.description}
                     </p>
-                    <a
-                      href="#contact"
+                    <button
+                      type="button"
+                      onClick={() => setActiveItem(item)}
                       className="mt-auto inline-flex items-center justify-end gap-1 pt-4 text-xs font-extrabold text-[#22A755] transition group-hover:translate-x-1 sm:text-sm"
                     >
                       Lihat
-                      <HiArrowTopRightOnSquare className="h-4 w-4" aria-hidden="true" />
-                    </a>
+                      <HiMagnifyingGlassPlus className="h-4 w-4" aria-hidden="true" />
+                    </button>
                   </div>
                 </article>
               </MotionReveal>
@@ -134,6 +135,9 @@ export default function Portfolio({ items = portfolioItems }: { items?: Portfoli
           </button>
         </div>
       </div>
+      {activeItem ? (
+        <PortfolioLightbox item={activeItem} onClose={() => setActiveItem(null)} />
+      ) : null}
     </section>
   );
 }

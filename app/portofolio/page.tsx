@@ -1,20 +1,9 @@
 import CountUpValue from "@/components/CountUpValue";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import PortfolioPageGallery from "@/components/PortfolioPageGallery";
 import { getPublicCmsContent } from "@/lib/public/cms";
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
-import { HiArrowTopRightOnSquare } from "react-icons/hi2";
-
-const filterButtons = [
-  "Semua",
-  "Social Media",
-  "Graphic Design",
-  "Digital Ads",
-  "Website & Landing Page",
-  "Branding",
-];
 
 const stats = [
   { value: "100+", label: "Project digital diluncurkan" },
@@ -69,74 +58,7 @@ export default async function PortofolioPage() {
             </div>
           </div>
 
-          <div className="mt-7 flex flex-wrap gap-2.5 sm:gap-3">
-            {filterButtons.map((button) => (
-              <button
-                key={button}
-                type="button"
-                className="inline-flex min-h-8 items-center justify-center rounded-lg border border-white/85 px-3 text-[0.7rem] font-light leading-none text-white transition hover:bg-white/10 sm:min-h-9 sm:px-4 sm:text-xs"
-              >
-                {button}
-              </button>
-            ))}
-          </div>
-
-          <div className="relative mt-6 flex flex-1 items-center justify-center">
-            <div className="flex w-full max-w-5xl flex-wrap justify-center gap-3 lg:gap-4">
-              {portfolioItems.map((item) => (
-                <article
-                  key={item.name}
-                  className="group flex h-full basis-[calc((100%-0.75rem)/2)] flex-col rounded-lg border-2 border-[#49E681] bg-[#DFF3FF] p-2 text-[#12345A] shadow-lg shadow-black/20 transition hover:-translate-y-1 hover:shadow-[#49E681]/20 sm:p-3 lg:basis-[calc((100%-2rem)/3)]"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="inline-flex rounded-full bg-[#22C55E] px-2 py-1 text-[0.5rem] font-extrabold leading-none text-white sm:px-2.5 sm:text-[0.65rem]">
-                      Featured
-                    </span>
-                    <span className="rounded-full bg-[#22C55E]/15 px-1.5 py-1 text-[0.48rem] font-extrabold leading-none text-[#22A755] sm:px-2 sm:text-[0.58rem]">
-                      {item.category}
-                    </span>
-                  </div>
-
-                  <h2 className="mt-2 text-sm font-extrabold leading-none text-[#333333] sm:mt-2.5 sm:text-lg">
-                    Recent Work
-                  </h2>
-
-                  <div className="mt-2 aspect-[1.34/1] w-full overflow-hidden rounded-md bg-white p-1 sm:mt-3 sm:p-1.5">
-                    {item.image ? (
-                      <Image
-                        src={item.image}
-                        alt={`${item.name} portfolio preview`}
-                        width={620}
-                        height={430}
-                        unoptimized
-                        className="h-full w-full object-contain transition duration-300"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center rounded-sm bg-[#EAF8FF] px-3 text-center text-[0.6rem] font-extrabold leading-4 text-[#12345A]/55 sm:text-xs">
-                        Gambar dari CMS
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="mt-2 flex flex-1 flex-col sm:mt-3">
-                    <h3 className="text-[0.68rem] font-extrabold leading-tight text-[#64748B] sm:text-sm">
-                      {item.name}
-                    </h3>
-                    <p className="mt-1 line-clamp-2 text-[0.56rem] font-medium leading-3 text-[#7B8894] sm:mt-1.5 sm:text-[0.7rem] sm:leading-4">
-                      {item.description}
-                    </p>
-                    <Link
-                      href="/#contact"
-                      className="mt-auto inline-flex items-center justify-end gap-1 pt-2 text-[0.6rem] font-extrabold text-[#22A755] transition group-hover:translate-x-1 sm:pt-3 sm:text-xs"
-                    >
-                      Lihat
-                      <HiArrowTopRightOnSquare className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
-                    </Link>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
+          <PortfolioPageGallery items={portfolioItems} />
         </section>
       </main>
       <Footer />
