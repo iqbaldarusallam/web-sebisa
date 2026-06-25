@@ -15,7 +15,7 @@ import PortfolioLightbox from "./PortfolioLightbox";
 
 export default function Portfolio({ items = portfolioItems }: { items?: PortfolioItem[] }) {
   const cmsFeaturedItems = items.filter((item) => item.isFeatured);
-  const featuredItems = (cmsFeaturedItems.length > 0 ? cmsFeaturedItems : items).slice(0, 3);
+  const featuredItems = (cmsFeaturedItems.length > 0 ? cmsFeaturedItems : items);
   const [activeItem, setActiveItem] = useState<PortfolioItem | null>(null);
   const {
     canScrollNext,
