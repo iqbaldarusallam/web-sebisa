@@ -65,6 +65,7 @@ export default function Team({ items = teamMembers }: { items?: TeamMember[] }) 
             type="button"
             onClick={() => scrollByDirection("prev")}
             disabled={!canScrollPrev}
+              suppressHydrationWarning
             className="slider-arrow"
             aria-label="Geser tim sebelumnya"
           >
@@ -76,6 +77,7 @@ export default function Team({ items = teamMembers }: { items?: TeamMember[] }) 
             max={scrollMax || 1}
             value={Math.min(scrollValue, scrollMax)}
             onChange={(event) => handleSliderChange(Number(event.target.value))}
+            suppressHydrationWarning
             className="sebisa-scroll-slider w-full max-w-[26rem]"
             aria-label="Geser tim"
           />
@@ -83,6 +85,7 @@ export default function Team({ items = teamMembers }: { items?: TeamMember[] }) 
             type="button"
             onClick={() => scrollByDirection("next")}
             disabled={!canScrollNext}
+              suppressHydrationWarning
             className="slider-arrow"
             aria-label="Geser tim berikutnya"
           >

@@ -1,11 +1,12 @@
 "use client";
+import { useSafeReducedMotion } from "../useSafeReducedMotion";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState } from "react";
 import { HiCheck } from "react-icons/hi2";
 
 export default function SuccessCheckIcon() {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useSafeReducedMotion();
   const [tapCount, setTapCount] = useState(0);
 
   return (

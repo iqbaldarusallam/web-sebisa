@@ -1,7 +1,8 @@
 "use client";
+import { useSafeReducedMotion } from "./useSafeReducedMotion";
 
 import type { Service, ServiceIcon } from "@/data/services";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { useScrollSlider } from "./useScrollSlider";
@@ -111,7 +112,7 @@ function getBadge(service: Service) {
 }
 
 export default function PricingCards({ services }: { services: Service[] }) {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useSafeReducedMotion();
 
   return (
     <div className="space-y-14">
@@ -261,6 +262,7 @@ function PricingCategory({
           type="button"
           onClick={() => scrollByDirection("prev")}
           disabled={!canScrollPrev}
+              suppressHydrationWarning
           className="slider-arrow"
           aria-label={`Geser paket ${category.title} sebelumnya`}
         >
@@ -272,13 +274,15 @@ function PricingCategory({
           max={scrollMax || 1}
           value={Math.min(scrollValue, scrollMax)}
           onChange={(event) => handleSliderChange(Number(event.target.value))}
-          className="sebisa-scroll-slider w-full max-w-[22rem]"
+          suppressHydrationWarning
+            className="sebisa-scroll-slider w-full max-w-[22rem]"
           aria-label={`Geser paket ${category.title}`}
         />
         <button
           type="button"
           onClick={() => scrollByDirection("next")}
           disabled={!canScrollNext}
+              suppressHydrationWarning
           className="slider-arrow"
           aria-label={`Geser paket ${category.title} berikutnya`}
         >
@@ -288,3 +292,4 @@ function PricingCategory({
     </section>
   );
 }
+

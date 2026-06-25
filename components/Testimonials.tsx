@@ -1,7 +1,8 @@
 "use client";
+import { useSafeReducedMotion } from "./useSafeReducedMotion";
 
 import { testimonials, type Testimonial } from "@/data/testimonials";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FaStar } from "react-icons/fa6";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
@@ -12,7 +13,7 @@ export default function Testimonials({ items = testimonials }: { items?: Testimo
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useSafeReducedMotion();
 
   const syncActiveCard = useCallback(() => {
     const container = scrollRef.current;
@@ -178,6 +179,7 @@ export default function Testimonials({ items = testimonials }: { items?: Testimo
             onClick={goToPrevious}
             className="slider-arrow bg-white"
             disabled={activeIndex === 0}
+            suppressHydrationWarning
             aria-label="Pindah ke testimoni sebelumnya"
           >
             <HiChevronLeft className="h-5 w-5" aria-hidden="true" />
@@ -203,6 +205,7 @@ export default function Testimonials({ items = testimonials }: { items?: Testimo
             onClick={goToNext}
             className="slider-arrow bg-white"
             disabled={activeIndex === testimonialItems.length - 1}
+            suppressHydrationWarning
             aria-label="Pindah ke testimoni berikutnya"
           >
             <HiChevronRight className="h-5 w-5" aria-hidden="true" />
@@ -212,3 +215,4 @@ export default function Testimonials({ items = testimonials }: { items?: Testimo
     </section>
   );
 }
+

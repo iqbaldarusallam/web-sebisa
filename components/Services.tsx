@@ -136,6 +136,7 @@ export default function Services({ items = services }: { items?: Service[] }) {
             type="button"
             onClick={() => scrollByDirection("prev")}
             disabled={!canScrollPrev}
+              suppressHydrationWarning
             className="slider-arrow"
             aria-label="Geser layanan sebelumnya"
           >
@@ -147,6 +148,7 @@ export default function Services({ items = services }: { items?: Service[] }) {
             max={scrollMax || 1}
             value={Math.min(scrollValue, scrollMax)}
             onChange={(event) => handleSliderChange(Number(event.target.value))}
+            suppressHydrationWarning
             className="sebisa-scroll-slider w-full max-w-[26rem]"
             aria-label="Geser layanan"
           />
@@ -154,6 +156,7 @@ export default function Services({ items = services }: { items?: Service[] }) {
             type="button"
             onClick={() => scrollByDirection("next")}
             disabled={!canScrollNext}
+              suppressHydrationWarning
             className="slider-arrow"
             aria-label="Geser layanan berikutnya"
           >

@@ -1,6 +1,7 @@
 "use client";
+import { useSafeReducedMotion } from "./useSafeReducedMotion";
 
-import { useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 type CountUpValueProps = {
@@ -37,7 +38,7 @@ export default function CountUpValue({
   className = "",
   duration = 1250,
 }: CountUpValueProps) {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useSafeReducedMotion();
   const elementRef = useRef<HTMLSpanElement>(null);
   const frameRef = useRef<number | null>(null);
   const hasStartedRef = useRef(false);
@@ -131,3 +132,4 @@ export default function CountUpValue({
     </span>
   );
 }
+

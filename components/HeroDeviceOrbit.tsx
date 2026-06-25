@@ -1,6 +1,7 @@
 "use client";
+import { useSafeReducedMotion } from "./useSafeReducedMotion";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import {
   HiBolt,
@@ -75,7 +76,7 @@ const orbitTransition = {
 };
 
 export default function HeroDeviceOrbit() {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useSafeReducedMotion();
 
   return (
     <div className="relative mx-auto h-82 w-full max-w-164 overflow-hidden sm:h-106 sm:overflow-visible lg:h-120">
@@ -248,3 +249,4 @@ export default function HeroDeviceOrbit() {
     </div>
   );
 }
+

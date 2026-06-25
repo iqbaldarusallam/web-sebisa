@@ -1,6 +1,7 @@
 "use client";
+import { useSafeReducedMotion } from "./useSafeReducedMotion";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -15,7 +16,7 @@ export type BtsGridItem = {
 };
 
 export default function BtsVideoGrid({ items }: { items: BtsGridItem[] }) {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useSafeReducedMotion();
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -95,13 +96,10 @@ export default function BtsVideoGrid({ items }: { items: BtsGridItem[] }) {
               </div>
             </div>
 
-            <div className="mt-4 flex flex-1 flex-col">
-              <h3 className="text-[1.15rem] font-extrabold leading-none text-[#333333] sm:text-[1.45rem]">
-                Recent Work
-              </h3>
-              <h4 className="mt-3 text-sm font-extrabold leading-tight text-[#64748B] sm:text-base">
+            <div className="mt-3 flex flex-1 flex-col">
+              <h3 className="text-sm font-extrabold leading-tight text-[#64748B] sm:text-base">
                 {item.title}
-              </h4>
+              </h3>
               <p className="mt-2 line-clamp-2 text-[0.72rem] font-medium leading-5 text-[#7B8894] sm:text-xs">
                 {item.description}
               </p>
@@ -148,3 +146,4 @@ export default function BtsVideoGrid({ items }: { items: BtsGridItem[] }) {
     </>
   );
 }
+

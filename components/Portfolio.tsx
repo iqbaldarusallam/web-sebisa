@@ -121,6 +121,7 @@ export default function Portfolio({ items = portfolioItems }: { items?: Portfoli
             max={scrollMax || 1}
             value={Math.min(scrollValue, scrollMax)}
             onChange={(event) => handleSliderChange(Number(event.target.value))}
+            suppressHydrationWarning
             className="sebisa-scroll-slider w-full max-w-[26rem]"
             aria-label="Geser portofolio"
           />

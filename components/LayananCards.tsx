@@ -1,12 +1,13 @@
 "use client";
+import { useSafeReducedMotion } from "./useSafeReducedMotion";
 
 import type { Service } from "@/data/services";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState } from "react";
 import { HiArrowRight } from "react-icons/hi2";
 
 export default function LayananCards({ services }: { services: Service[] }) {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useSafeReducedMotion();
 
   return (
     <div className="grid grid-cols-2 gap-3 md:gap-5">
@@ -85,3 +86,4 @@ function ServiceCard({
     </motion.article>
   );
 }
+

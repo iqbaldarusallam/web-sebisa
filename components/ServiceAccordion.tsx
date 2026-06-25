@@ -1,7 +1,8 @@
 "use client";
+import { useSafeReducedMotion } from "./useSafeReducedMotion";
 
 import type { Service } from "@/data/services";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -110,7 +111,7 @@ function formatMoney(value: number) {
 }
 
 export default function ServiceAccordion({ services }: { services: Service[] }) {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useSafeReducedMotion();
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
@@ -294,3 +295,4 @@ export default function ServiceAccordion({ services }: { services: Service[] }) 
     </div>
   );
 }
+

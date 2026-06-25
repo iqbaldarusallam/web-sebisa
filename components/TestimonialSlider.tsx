@@ -1,6 +1,7 @@
 "use client";
+import { useSafeReducedMotion } from "./useSafeReducedMotion";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
 import { FaStar } from "react-icons/fa6";
 import { HiArrowLeft, HiArrowRight } from "react-icons/hi2";
@@ -39,7 +40,7 @@ export default function TestimonialSlider({ items }: TestimonialSliderProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useSafeReducedMotion();
   const activeItem = items[activeIndex];
   const shouldAutoPlay = !isPaused && items.length > 1;
 
@@ -202,3 +203,4 @@ export default function TestimonialSlider({ items }: TestimonialSliderProps) {
     </div>
   );
 }
+

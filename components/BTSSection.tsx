@@ -1,6 +1,7 @@
 "use client";
+import { useSafeReducedMotion } from "./useSafeReducedMotion";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -18,7 +19,7 @@ export type BtsCardItem = {
 };
 
 export default function BTSSection({ items }: { items: BtsCardItem[] }) {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useSafeReducedMotion();
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const {
@@ -107,7 +108,7 @@ export default function BTSSection({ items }: { items: BtsCardItem[] }) {
                 tabIndex={0}
                 aria-label={`Putar video ${item.title}`}
               >
-                <div className="relative aspect-video overflow-hidden bg-[#08111F]">
+                <div className="relative aspect-[620/430] overflow-hidden bg-[#08111F]">
                   {item.thumbnailUrl ? (
                     <Image
                       src={item.thumbnailUrl}
@@ -137,13 +138,10 @@ export default function BTSSection({ items }: { items: BtsCardItem[] }) {
                     </span>
                   </div>
                 </div>
-                <div className="mt-4 flex flex-1 flex-col">
-                  <h3 className="text-[1.15rem] font-extrabold leading-none text-white sm:text-[1.45rem]">
-                    Recent Work
-                  </h3>
-                  <h4 className="mt-3 text-sm font-extrabold leading-tight text-white/80 sm:text-base">
+                <div className="mt-3 flex flex-1 flex-col">
+                  <h3 className="text-sm font-extrabold leading-tight text-white/80 sm:text-base">
                     {item.title}
-                  </h4>
+                  </h3>
                   <p className="mt-2 line-clamp-2 text-[0.72rem] font-medium leading-5 text-slate-300 sm:text-xs">
                     {item.description}
                   </p>
@@ -154,11 +152,11 @@ export default function BTSSection({ items }: { items: BtsCardItem[] }) {
         </div>
 
         <div className="mt-6 flex items-center justify-center gap-3 lg:hidden">
-          <button type="button" onClick={() => scrollByDirection("prev")} disabled={!canScrollPrev} className="slider-arrow" aria-label="Geser BTS sebelumnya">
+          <button type="button" onClick={() => scrollByDirection("prev")} disabled={!canScrollPrev} className="slider-arrow" suppressHydrationWarning aria-label="Geser BTS sebelumnya">
             <HiChevronLeft className="h-5 w-5" aria-hidden="true" />
           </button>
-          <input type="range" min={0} max={scrollMax || 1} value={Math.min(scrollValue, scrollMax)} onChange={(event) => handleSliderChange(Number(event.target.value))} className="sebisa-scroll-slider w-full max-w-[26rem]" aria-label="Geser BTS" />
-          <button type="button" onClick={() => scrollByDirection("next")} disabled={!canScrollNext} className="slider-arrow" aria-label="Geser BTS berikutnya">
+          <input type="range" min={0} max={scrollMax || 1} value={Math.min(scrollValue, scrollMax)} onChange={(event) => handleSliderChange(Number(event.target.value))} className="sebisa-scroll-slider w-full max-w-[26rem]" suppressHydrationWarning aria-label="Geser BTS" />
+          <button type="button" onClick={() => scrollByDirection("next")} disabled={!canScrollNext} className="slider-arrow" suppressHydrationWarning aria-label="Geser BTS berikutnya">
             <HiChevronRight className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
@@ -206,7 +204,7 @@ export default function BTSSection({ items }: { items: BtsCardItem[] }) {
                 src={activeVideo}
                 controls
                 preload="metadata"
-                className="aspect-video w-full"
+                className="aspect-[620/430] w-full"
               >
                 Browser tidak mendukung video.
               </video>
@@ -218,3 +216,4 @@ export default function BTSSection({ items }: { items: BtsCardItem[] }) {
     </section>
   );
 }
+

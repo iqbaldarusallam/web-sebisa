@@ -77,9 +77,12 @@ export function useScrollSlider() {
     timeoutRef.current = window.setTimeout(syncScrollState, 260);
   };
 
+  const canScrollNext = !hasMeasured || scrollValue < scrollMax - 2;
+  const canScrollPrev = hasMeasured && scrollValue > 2;
+
   return {
-    canScrollNext: !hasMeasured || scrollValue < scrollMax - 2,
-    canScrollPrev: hasMeasured && scrollValue > 2,
+    canScrollNext: Boolean(canScrollNext),
+    canScrollPrev: Boolean(canScrollPrev),
     handleScroll,
     handleSliderChange,
     scrollByDirection,
