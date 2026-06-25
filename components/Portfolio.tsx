@@ -15,7 +15,7 @@ import PortfolioLightbox from "./PortfolioLightbox";
 
 export default function Portfolio({ items = portfolioItems }: { items?: PortfolioItem[] }) {
   const cmsFeaturedItems = items.filter((item) => item.isFeatured);
-  const featuredItems = (cmsFeaturedItems.length > 0 ? cmsFeaturedItems : items);
+  const featuredItems = (cmsFeaturedItems.length > 0 ? cmsFeaturedItems : items).slice(0, 3);
   const [activeItem, setActiveItem] = useState<PortfolioItem | null>(null);
   const {
     canScrollNext,
@@ -47,11 +47,11 @@ export default function Portfolio({ items = portfolioItems }: { items?: Portfoli
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className="sebisa-hidden-scrollbar -mx-4 mt-6 overflow-x-auto px-4 pb-3 sm:-mx-[4.5rem] sm:px-[4.5rem] lg:mx-0 lg:overflow-visible lg:px-0"
+          className="sebisa-hidden-scrollbar -mx-4 mt-6 overflow-x-auto px-4 pb-3 sm:-mx-[4.5rem] sm:px-[4.5rem] lg:-mx-20 lg:px-20"
         >
-          <div className="flex min-w-max gap-3 sm:gap-5 lg:min-w-0 lg:w-full lg:flex-wrap lg:justify-center lg:gap-6">
+          <div className="flex min-w-max gap-3 sm:gap-5 lg:gap-6">
             {featuredItems.map((item, index) => (
-              <MotionReveal key={item.name} delay={index * 0.05} className="lg:w-auto lg:basis-[calc((100%-2rem)/3)]">
+              <MotionReveal key={item.name} delay={index * 0.05} >
                 <article className="group interactive-lift flex h-full w-[min(16.5rem,calc(100vw-2rem))] flex-col rounded-lg border-2 border-[#49E681] bg-[#DFF3FF] p-3.5 text-[#12345A] shadow-lg shadow-black/25 transition duration-300 hover:shadow-[#49E681]/20 sm:w-[24rem] sm:p-4">
                   <div className="flex items-center justify-between gap-3">
                     <span className="inline-flex rounded-full bg-[#22C55E] px-2.5 py-1 text-[0.68rem] font-extrabold leading-none text-white sm:px-3 sm:text-xs">
@@ -105,7 +105,7 @@ export default function Portfolio({ items = portfolioItems }: { items?: Portfoli
           </div>
         </div>
 
-        <div className="mt-7 flex items-center justify-center gap-3 lg:hidden">
+        <div className="mt-7 flex items-center justify-center gap-3">
           <button
             type="button"
             onClick={() => scrollByDirection("prev")}
