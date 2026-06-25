@@ -103,11 +103,13 @@ export default function Services({ items = services }: { items?: Service[] }) {
                   <div className="relative mt-auto rounded-lg border border-[#12345A]/10 bg-white/85 px-3 py-2.5 shadow-sm">
                     <div className="flex items-center justify-between gap-3">
                       <span className="rounded-full bg-[#22C55E] px-2.5 py-1 text-[0.58rem] font-extrabold uppercase tracking-[0.06em] text-white">
-                        Promo
+                        {service.compareAtPrice > service.price ? "Promo" : "Harga"}
                       </span>
-                      <span className="whitespace-nowrap text-xs font-bold text-slate-500 line-through">
-                        {formatMoney(service.compareAtPrice)}
-                      </span>
+                      {service.compareAtPrice > service.price ? (
+                        <span className="whitespace-nowrap text-xs font-bold text-slate-500 line-through">
+                          {formatMoney(service.compareAtPrice)}
+                        </span>
+                      ) : null}
                     </div>
                     <p className="mt-2.5 text-[0.68rem] font-extrabold uppercase tracking-[0.1em] text-slate-500">
                       Mulai dari

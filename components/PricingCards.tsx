@@ -48,6 +48,10 @@ function formatMoney(value: number) {
 }
 
 function getFeatures(service: Service) {
+  if (service.features && service.features.length > 0) {
+    return service.features.slice(0, 6);
+  }
+
   const fragments = service.description
     .split(/,| dan | untuk | agar /i)
     .map((item) => item.trim())
@@ -62,19 +66,48 @@ function getFeatures(service: Service) {
   return [...new Set(features)].slice(0, 6);
 }
 
-function getBadge(index: number, service: Service) {
-  if (index === 1) {
-    return "POPULER";
+function getDiscountBadge(service: Service) {
+  if (service.compareAtPrice <= service.price) {
+    return "";
   }
 
-  if (service.compareAtPrice > service.price) {
-    const percent = Math.round(
-      ((service.compareAtPrice - service.price) / service.compareAtPrice) * 100,
-    );
-    return `Hemat ${percent}%`;
+  const percent = Math.round(
+    ((service.compareAtPrice - service.price) / service.compareAtPrice) * 100,
+  );
+
+  return `Hemat ${percent}%`;
+}
+
+function getBadge(service: Service) {
+  const customBadge = service.badgeLabel?.trim();
+  const badgeType = service.badgeType ?? (service.isPopular ? "popular" : "discount");
+
+  if (badgeType === "popular") {
+    return {
+      label: "POPULER",
+      tone: "popular",
+    };
   }
 
-  return "";
+  if (badgeType === "custom" && customBadge) {
+    return {
+      label: customBadge,
+      tone: "custom",
+    };
+  }
+
+  if (badgeType !== "discount") {
+    return null;
+  }
+
+  const discountBadge = getDiscountBadge(service);
+
+  return discountBadge
+    ? {
+        label: discountBadge,
+        tone: "discount",
+      }
+    : null;
 }
 
 export default function PricingCards({ services }: { services: Service[] }) {
@@ -143,34 +176,37 @@ function PricingCategory({
         className="sebisa-hidden-scrollbar -mx-4 overflow-x-auto px-4 pb-4 pt-5 sm:-mx-8 sm:px-8 lg:mx-0 lg:overflow-visible lg:px-0"
       >
         <div className="flex w-max gap-4 overflow-visible md:gap-5 lg:w-full lg:flex-wrap lg:justify-center">
-              {services.map((service, index) => (
-                <motion.article
-                  key={service.title}
-                  initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-                  whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-                  whileHover={reduceMotion ? undefined : { y: -5 }}
-                  viewport={{ once: true, amount: 0.2 }}
-                  transition={{
-                    duration: 0.75,
-                    delay: index * 0.05,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
-                  className={`relative flex h-auto w-[16.5rem] shrink-0 flex-col overflow-visible rounded-xl border-2 bg-[#0A0F1E] px-3.5 pb-4 pt-5 text-white shadow-xl shadow-black/25 transition-[border-color,box-shadow,filter] duration-300 hover:shadow-2xl hover:shadow-cyan-950/25 sm:w-[20rem] sm:px-4 sm:pb-5 sm:pt-6 lg:w-auto lg:basis-[calc((100%-2.5rem)/3)] ${
-                    index === 1 ? "border-red-500" : "border-white/85"
-                  }`}
-                >
+              {services.map((service, index) => {
+                const badge = getBadge(service);
+
+                return (
+                  <motion.article
+                    key={service.title}
+                    initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+                    whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+                    whileHover={reduceMotion ? undefined : { y: -5 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    transition={{
+                      duration: 0.75,
+                      delay: index * 0.05,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
+                    className={`relative flex h-auto w-[16.5rem] shrink-0 flex-col overflow-visible rounded-xl border-2 bg-[#0A0F1E] px-3.5 pb-4 pt-5 text-white shadow-xl shadow-black/25 transition-[border-color,box-shadow,filter] duration-300 hover:shadow-2xl hover:shadow-cyan-950/25 sm:w-[20rem] sm:px-4 sm:pb-5 sm:pt-6 lg:w-auto lg:basis-[calc((100%-2.5rem)/3)] ${
+                      badge?.tone === "popular" ? "border-red-500" : "border-white/85"
+                    }`}
+                  >
                   <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-xl">
                     <div className="absolute inset-0 bg-[linear-gradient(180deg,#12345A_0%,#0A0F1E_48%,#0A0F1E_100%)]" />
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_12%,rgba(6,182,212,0.28),transparent_34%)]" />
                   </div>
 
-                  {getBadge(index, service) ? (
+                  {badge ? (
                     <div
                       className={`absolute -top-4 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-full px-3 py-1 text-[8px] font-bold uppercase text-white shadow-lg sm:px-4 sm:text-[10px] ${
-                        index === 1 ? "bg-red-500" : "bg-[#12345A]"
+                        badge.tone === "popular" ? "bg-red-500" : "bg-[#12345A]"
                       }`}
                     >
-                      {getBadge(index, service)}
+                      {badge.label}
                     </div>
                   ) : null}
 
@@ -204,7 +240,7 @@ function PricingCategory({
                     </ul>
 
                     <p className="mt-4 text-center text-xs font-extrabold text-white/85">
-                      Timeline menyesuaikan scope
+                      {service.durationLabel ?? "Timeline menyesuaikan scope"}
                     </p>
 
                     <Link
@@ -214,8 +250,9 @@ function PricingCategory({
                       Beli Sekarang
                     </Link>
                   </div>
-                </motion.article>
-              ))}
+                  </motion.article>
+                );
+              })}
             </div>
       </div>
 

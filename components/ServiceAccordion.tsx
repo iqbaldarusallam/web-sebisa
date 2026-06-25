@@ -118,6 +118,8 @@ export default function ServiceAccordion({ services }: { services: Service[] }) 
       {services.map((service, index) => {
         const visual = serviceVisuals[service.icon];
         const detail = detailsByIcon[service.icon];
+        const scopeItems = service.features?.length ? service.features : detail.scope;
+        const timeline = service.durationLabel ?? detail.timeline;
         const panelId = `service-panel-${index}`;
         const isOpen = openIndex === index;
 
@@ -215,7 +217,7 @@ export default function ServiceAccordion({ services }: { services: Service[] }) 
                       <div className="rounded-lg border border-[#D7E8F3] bg-white p-4">
                         <h4 className="text-xs font-black text-[#12345A]">Cakupan kerja</h4>
                         <ul className="mt-3 space-y-2">
-                          {detail.scope.map((item) => (
+                          {scopeItems.map((item) => (
                             <li
                               key={item}
                               className="flex gap-2 text-[0.72rem] font-medium leading-5 text-[#596779]"
@@ -248,11 +250,13 @@ export default function ServiceAccordion({ services }: { services: Service[] }) 
                     <aside className="flex flex-col rounded-lg bg-[#0A0F1E] p-4 text-white">
                       <div className="flex items-center justify-between gap-3">
                         <span className="rounded-full bg-[#22C55E] px-2.5 py-1 text-[0.58rem] font-extrabold uppercase text-white">
-                          Promo
+                          {service.compareAtPrice > service.price ? "Promo" : "Harga"}
                         </span>
-                        <span className="text-xs font-bold text-white/40 line-through">
-                          {formatMoney(service.compareAtPrice)}
-                        </span>
+                        {service.compareAtPrice > service.price ? (
+                          <span className="text-xs font-bold text-white/40 line-through">
+                            {formatMoney(service.compareAtPrice)}
+                          </span>
+                        ) : null}
                       </div>
                       <p className="mt-5 text-[0.62rem] font-extrabold uppercase tracking-[0.1em] text-white/45">
                         Investment
@@ -266,7 +270,7 @@ export default function ServiceAccordion({ services }: { services: Service[] }) 
                           <p className="text-[0.62rem] font-extrabold uppercase tracking-[0.08em] text-white/45">
                             Estimasi
                           </p>
-                          <p className="mt-1 text-sm font-black">{detail.timeline}</p>
+                          <p className="mt-1 text-sm font-black">{timeline}</p>
                         </div>
                       </div>
                       <p className="mt-4 text-[0.7rem] font-medium leading-5 text-white/55">
