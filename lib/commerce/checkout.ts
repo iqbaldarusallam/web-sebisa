@@ -69,11 +69,11 @@ async function checkoutAmountFromCms(serviceName: string): Promise<number | null
   }
 
   try {
-    const rows = await supabaseSelect<{ base_price: number | null }>(
+    const rows = await supabaseSelect<{ promo_price: number | null }>(
       "services",
-      `select=base_price&title=eq.${encodeURIComponent(serviceName)}&is_published=eq.true&limit=1`,
+      `select=promo_price&title=eq.${encodeURIComponent(serviceName)}&is_published=eq.true&limit=1`,
     );
-    const price = rows[0]?.base_price;
+    const price = rows[0]?.promo_price;
 
     if (typeof price === "number" && Number.isFinite(price) && price > 0) {
       return price;

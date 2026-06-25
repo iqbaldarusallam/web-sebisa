@@ -21,7 +21,7 @@ export default function ClientLogos({ items = clientLogos }: { items?: ClientLog
                 alt={`${logo.name} logo`}
                 width={72}
                 height={72}
-                className="max-h-14 w-auto max-w-14 object-contain sm:max-h-16 sm:max-w-16"
+                className="h-auto max-h-14 w-auto max-w-14 object-contain sm:max-h-16 sm:max-w-16"
               />
             ) : (
               <span className="line-clamp-2">{logo.name}</span>

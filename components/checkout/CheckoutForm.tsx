@@ -86,6 +86,10 @@ export default function CheckoutForm({
   const selectedServiceData =
     services.find((service) => service.title === selectedService) ??
     services[0];
+  const hasSelectedServicePromo = Boolean(
+    selectedServiceData &&
+      selectedServiceData.compareAtPrice > selectedServiceData.price,
+  );
 
   function goToSuccess(orderId: string, paymentStatus: string) {
     const params = new URLSearchParams({
@@ -223,14 +227,16 @@ export default function CheckoutForm({
           <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
             <span className="inline-flex items-center gap-2 rounded-full bg-[#20C4E8]/12 px-3 py-1 text-xs font-black text-[#20C4E8]">
               <IoIosPricetags className="h-4 w-4" aria-hidden="true" />
-              Harga Promo
+              {hasSelectedServicePromo ? "Harga Promo" : "Harga Layanan"}
             </span>
-            <span className="rounded-full bg-[#22C55E] px-3 py-1 text-[0.68rem] font-black text-white">
-              Hemat{" "}
-              {formatMoney(
-                selectedServiceData.compareAtPrice - selectedServiceData.price,
-              )}
-            </span>
+            {hasSelectedServicePromo ? (
+              <span className="rounded-full bg-[#22C55E] px-3 py-1 text-[0.68rem] font-black text-white">
+                Hemat{" "}
+                {formatMoney(
+                  selectedServiceData.compareAtPrice - selectedServiceData.price,
+                )}
+              </span>
+            ) : null}
           </div>
             <div className="grid gap-3 px-3 py-3 sm:grid-cols-[1fr_auto] sm:items-end sm:px-4 sm:py-4">
             <div className="min-w-0">
@@ -243,9 +249,11 @@ export default function CheckoutForm({
               </p>
             </div>
             <div className="text-left sm:text-right">
-              <p className="text-sm font-bold text-white/42 line-through">
-                {formatMoney(selectedServiceData.compareAtPrice)}
-              </p>
+              {hasSelectedServicePromo ? (
+                <p className="text-sm font-bold text-white/42 line-through">
+                  {formatMoney(selectedServiceData.compareAtPrice)}
+                </p>
+              ) : null}
               <p className="mt-1 text-2xl font-black leading-none text-[#20C4E8] sm:text-3xl">
                 {formatMoney(selectedServiceData.price)}
               </p>
