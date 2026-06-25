@@ -1,113 +1,34 @@
-import { deleteCmsItem, saveCmsItem } from "@/app/admin/actions";
+import { saveCmsItem } from "@/app/admin/actions";
 import type { AdminCollectionConfig, AdminField } from "@/lib/admin/collections";
 import type { AdminCollectionRow } from "@/lib/admin/types";
-import Image from "next/image";
 import Link from "next/link";
-import {
-  HiArrowLeft,
-  HiArrowTopRightOnSquare,
-  HiPencilSquare,
-  HiPlus,
-  HiTrash,
-} from "react-icons/hi2";
+import { HiArrowLeft, HiPlus } from "react-icons/hi2";
+import AdminBadgeField from "./AdminBadgeField";
+import AdminDataTable from "./AdminDataTable";
 import CloudinaryUploadField from "./CloudinaryUploadField";
-
-function formatValue(value: unknown, type?: string) {
-  if (type === "boolean") {
-    return value ? "Ya" : "Tidak";
-  }
-
-  if (type === "money" && typeof value === "number") {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      maximumFractionDigits: 0,
-    }).format(value);
-  }
-
-  if (type === "date" && typeof value === "string") {
-    return new Intl.DateTimeFormat("id-ID", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    }).format(new Date(value));
-  }
-
-  if (value === null || value === undefined || value === "") {
-    return "-";
-  }
-
-  return String(value);
-}
-
-function renderTableCell(value: unknown, type?: string) {
-  if (type === "image") {
-    const src = typeof value === "string" ? value : "";
-
-    if (!src) {
-      return (
-        <span className="inline-flex h-12 w-16 items-center justify-center rounded-lg bg-slate-100 text-xs font-black text-slate-400">
-          -
-        </span>
-      );
-    }
-
-    return (
-      <div className="relative h-14 w-20 overflow-hidden rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
-        <Image src={src} alt="" fill sizes="80px" className="object-contain p-1" />
-      </div>
-    );
-  }
-
-  if (type === "url") {
-    const href = typeof value === "string" ? value : "";
-
-    if (!href) {
-      return "-";
-    }
-
-    return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noreferrer"
-        className="inline-flex items-center gap-1 rounded-full bg-[#173472]/8 px-3 py-1 text-xs font-black text-[#173472] transition hover:bg-[#173472] hover:text-white"
-      >
-        Buka
-        <HiArrowTopRightOnSquare className="h-3.5 w-3.5" aria-hidden="true" />
-      </a>
-    );
-  }
-
-  if (type === "boolean") {
-    return (
-      <span
-        className={`inline-flex rounded-full px-3 py-1 text-xs font-black ${
-          value ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500"
-        }`}
-      >
-        {formatValue(value, type)}
-      </span>
-    );
-  }
-
-  return <span className="line-clamp-2">{formatValue(value, type)}</span>;
-}
 
 function AdminInput({
   field,
   collectionKey,
+  rowValues,
   value,
 }: {
   field: AdminField;
   collectionKey: string;
+  rowValues?: Record<string, unknown>;
   value?: unknown;
 }) {
   const baseClass =
     "mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#173472] focus:ring-4 focus:ring-[#173472]/10";
+  const nestedClass =
+    "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#173472] focus:ring-4 focus:ring-[#173472]/10";
   const inputValue = value === null || value === undefined ? "" : String(value);
 
-  if (field.name === "imageUrl" || field.name === "logoUrl") {
+  if (
+    field.uploadKind ||
+    field.name === "imageUrl" ||
+    field.name === "logoUrl"
+  ) {
     return (
       <CloudinaryUploadField
         name={field.name}
@@ -115,6 +36,21 @@ function AdminInput({
         placeholder={field.placeholder}
         collectionKey={collectionKey}
         defaultValue={inputValue}
+        accept={field.accept}
+        mediaKind={field.uploadKind ?? "image"}
+        buttonLabel={field.uploadLabel}
+      />
+    );
+  }
+
+  if (field.type === "badge") {
+    return (
+      <AdminBadgeField
+        defaultType={inputValue || "discount"}
+        defaultText={
+          typeof rowValues?.badgeText === "string" ? rowValues.badgeText : ""
+        }
+        placeholder={field.customPlaceholder}
       />
     );
   }
@@ -134,7 +70,9 @@ function AdminInput({
 
   if (field.type === "checkbox") {
     const defaultChecked =
-      value === undefined || value === null ? true : Boolean(value);
+      value === undefined || value === null
+        ? field.name === "isPublished"
+        : Boolean(value);
 
     return (
       <label className="mt-2 flex min-h-12 items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold text-slate-700">
@@ -150,19 +88,38 @@ function AdminInput({
   }
 
   if (field.type === "select") {
+    const options = field.options ?? [];
+    const customValue =
+      field.allowCustom && inputValue && !options.includes(inputValue)
+        ? inputValue
+        : "";
+    const selectValue =
+      inputValue && options.includes(inputValue) ? inputValue : options[0] || "";
+
     return (
-      <select
-        name={field.name}
-        required={field.required}
-        defaultValue={inputValue}
-        className={baseClass}
-      >
-        {(field.options ?? []).map((option) => (
-          <option key={option} value={option} className="bg-white text-slate-900">
-            {option}
-          </option>
-        ))}
-      </select>
+      <div className="mt-2 space-y-3">
+        <select
+          name={field.name}
+          required={field.required}
+          defaultValue={selectValue}
+          className={nestedClass}
+        >
+          {options.map((option) => (
+            <option key={option} value={option} className="bg-white text-slate-900">
+              {option}
+            </option>
+          ))}
+        </select>
+        {field.allowCustom ? (
+          <input
+            type="text"
+            name={field.customFieldName ?? `${field.name}Custom`}
+            placeholder={field.customPlaceholder}
+            defaultValue={customValue}
+            className={nestedClass}
+          />
+        ) : null}
+      </div>
     );
   }
 
@@ -196,7 +153,9 @@ export default function AdminCollectionPage({
   isCreating?: boolean;
 }) {
   const editRow = editId ? rows.find((row) => row.id === editId) : undefined;
-  const showForm = isCreating || Boolean(editRow);
+  const maxItems = config.maxItems;
+  const isMaxReached = typeof maxItems === "number" && rows.length >= maxItems;
+  const showForm = Boolean(editRow) || (isCreating && !isMaxReached);
   const formTitle = editRow ? `Edit ${config.title}` : `Tambah ${config.title}`;
 
   return (
@@ -225,20 +184,28 @@ export default function AdminCollectionPage({
               <span className="text-xl font-black text-white">{rows.length}</span>
               <span className="ml-2 text-xs font-bold text-white/48">data</span>
             </div>
-            <Link
-              href={`${config.path}?new=1`}
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#20C4E8] px-4 text-sm font-black text-[#041B38] transition hover:bg-[#67E8F9]"
-            >
-              <HiPlus className="h-5 w-5" aria-hidden="true" />
-              Tambah Data
-            </Link>
+            {isMaxReached ? (
+              <span className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] px-4 text-sm font-black text-white/45">
+                Maksimal {maxItems} data
+              </span>
+            ) : (
+              <Link
+                href={`${config.path}?new=1`}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#20C4E8] px-4 text-sm font-black text-[#041B38] transition hover:bg-[#67E8F9]"
+              >
+                <HiPlus className="h-5 w-5" aria-hidden="true" />
+                Tambah Data
+              </Link>
+            )}
           </div>
         )}
       </section>
 
       {saved ? (
         <div className="rounded-2xl border border-[#22C55E]/20 bg-[#22C55E]/10 px-4 py-3 text-sm font-bold text-[#86EFAC]">
-          {saved === "demo"
+          {saved === "limit"
+            ? `Maksimal ${maxItems ?? ""} data. Hapus atau edit data lama terlebih dahulu.`
+            : saved === "demo"
             ? "Data belum tersimpan permanen."
             : "Data berhasil disimpan."}
         </div>
@@ -253,6 +220,11 @@ export default function AdminCollectionPage({
       {!supabaseConfigured ? (
         <div className="rounded-2xl border border-[#F59E0B]/20 bg-[#F59E0B]/10 px-4 py-3 text-sm font-bold text-[#FCD34D]">
           Penyimpanan belum aktif. Perubahan belum tersimpan permanen.
+        </div>
+      ) : null}
+      {isMaxReached ? (
+        <div className="rounded-2xl border border-[#20C4E8]/20 bg-[#20C4E8]/10 px-4 py-3 text-sm font-bold text-[#A5F3FC]">
+          Batas {config.title} adalah {maxItems} data. Data lama tetap bisa diedit atau dihapus.
         </div>
       ) : null}
 
@@ -274,6 +246,11 @@ export default function AdminCollectionPage({
                   <AdminInput
                     field={field}
                     collectionKey={config.key}
+                    rowValues={
+                      editRow
+                        ? (editRow as unknown as Record<string, unknown>)
+                        : undefined
+                    }
                     value={
                       editRow
                         ? (editRow as unknown as Record<string, unknown>)[field.name]
@@ -301,85 +278,7 @@ export default function AdminCollectionPage({
           </form>
         </section>
       ) : (
-        <section className="overflow-hidden rounded-2xl bg-white text-slate-900 shadow-xl shadow-black/15">
-          <div className="flex flex-col gap-2 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-xl font-black">Data {config.title}</h2>
-            <p className="mt-1 text-sm font-semibold text-slate-500">
-              {rows.length} data tersimpan
-            </p>
-          </div>
-          <Link
-            href={`${config.path}?new=1`}
-            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-[#173472] px-4 text-sm font-black text-[#173472] transition hover:bg-[#173472] hover:text-white"
-          >
-            <HiPlus className="h-5 w-5" aria-hidden="true" />
-            Tambah
-          </Link>
-        </div>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[820px] text-left">
-              <thead className="bg-slate-50 text-xs uppercase tracking-[0.08em] text-slate-500">
-                <tr>
-                  {config.columns.map((column) => (
-                    <th key={column.key} className="px-5 py-3.5 font-black">
-                      {column.label}
-                    </th>
-                  ))}
-                  <th className="px-5 py-3.5 font-black">Aksi</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-sm">
-                {rows.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={config.columns.length + 1}
-                      className="px-5 py-12 text-center text-sm font-semibold text-slate-500"
-                    >
-                      Belum ada data.
-                    </td>
-                  </tr>
-                ) : (
-                  rows.map((row) => (
-                    <tr key={row.id} className="transition hover:bg-slate-50/80">
-                    {config.columns.map((column) => {
-                      const value = (row as unknown as Record<string, unknown>)[column.key];
-
-                      return (
-                        <td key={column.key} className="max-w-[18rem] px-5 py-4 font-semibold text-slate-700">
-                          {renderTableCell(value, column.type)}
-                        </td>
-                      );
-                    })}
-                    <td className="px-5 py-4">
-                      <div className="flex flex-wrap gap-2">
-                        <Link
-                          href={`${config.path}?edit=${row.id}`}
-                          className="inline-flex min-h-9 items-center gap-1.5 rounded-lg px-2.5 text-xs font-black text-[#173472] transition hover:bg-[#173472]/8"
-                        >
-                          <HiPencilSquare className="h-4 w-4" aria-hidden="true" />
-                          Edit
-                        </Link>
-                        <form action={deleteCmsItem}>
-                          <input type="hidden" name="collection" value={config.key} />
-                          <input type="hidden" name="id" value={row.id} />
-                          <button
-                            type="submit"
-                            className="inline-flex min-h-9 items-center gap-1.5 rounded-lg px-2.5 text-xs font-black text-red-600 transition hover:bg-red-50"
-                          >
-                            <HiTrash className="h-4 w-4" aria-hidden="true" />
-                            Hapus
-                          </button>
-                        </form>
-                      </div>
-                    </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        <AdminDataTable config={config} rows={rows} />
       )}
     </div>
   );

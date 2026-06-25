@@ -21,7 +21,13 @@ type UploadResponse = {
   };
 };
 
+type UploadKind = "image" | "video" | "media";
+
 function resolveFolder(fieldName: string, collectionKey?: string) {
+  if (collectionKey === "bts") {
+    return "sebisa/bts";
+  }
+
   if (collectionKey === "team") {
     return "sebisa/team";
   }
@@ -43,17 +49,32 @@ export default function CloudinaryUploadField({
   required,
   collectionKey,
   defaultValue = "",
+  accept,
+  mediaKind = "image",
+  buttonLabel,
 }: {
   name: string;
   placeholder?: string;
   required?: boolean;
   collectionKey?: string;
   defaultValue?: string;
+  accept?: string;
+  mediaKind?: UploadKind;
+  buttonLabel?: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState(defaultValue);
   const [status, setStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const resolvedAccept =
+    accept ??
+    (mediaKind === "video"
+      ? "video/mp4,video/webm,video/quicktime"
+      : mediaKind === "media"
+      ? "image/png,image/jpeg,image/jpg,image/webp,video/mp4,video/webm,video/quicktime"
+      : "image/png,image/jpeg,image/jpg,image/webp");
+  const uploadLabel =
+    buttonLabel ?? (mediaKind === "video" ? "Upload Video" : "Upload Gambar");
 
   async function handleFileChange(file: File | null) {
     if (!file) {
@@ -72,7 +93,7 @@ export default function CloudinaryUploadField({
       const signature = (await signatureResponse.json()) as SignatureResponse;
 
       if (!signatureResponse.ok || !signature.ok) {
-        throw new Error("Fitur upload gambar belum siap.");
+        throw new Error("Fitur upload belum siap.");
       }
 
       const uploadData = new FormData();
@@ -92,7 +113,7 @@ export default function CloudinaryUploadField({
       const upload = (await uploadResponse.json()) as UploadResponse;
 
       if (!uploadResponse.ok || !upload.secure_url) {
-        throw new Error(upload.error?.message || "Upload gambar gagal.");
+        throw new Error(upload.error?.message || "Upload gagal.");
       }
 
       setValue(upload.secure_url);
@@ -123,7 +144,7 @@ export default function CloudinaryUploadField({
         <input
           ref={inputRef}
           type="file"
-          accept="image/png,image/jpeg,image/jpg,image/webp"
+          accept={resolvedAccept}
           className="hidden"
           onChange={(event) => handleFileChange(event.target.files?.[0] ?? null)}
         />
@@ -134,7 +155,7 @@ export default function CloudinaryUploadField({
           className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-[#173472]/20 bg-[#173472]/8 px-4 text-xs font-black text-[#173472] transition hover:bg-[#173472] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
         >
           <HiArrowUpTray className="h-4 w-4" aria-hidden="true" />
-          {status === "uploading" ? "Mengupload..." : "Upload Gambar"}
+          {status === "uploading" ? "Mengupload..." : uploadLabel}
         </button>
         {status === "success" || status === "error" ? (
           <span
