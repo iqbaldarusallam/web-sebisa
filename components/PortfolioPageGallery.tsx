@@ -60,7 +60,7 @@ export default function PortfolioPageGallery({ items }: { items: PortfolioItem[]
           {filteredItems.map((item) => (
             <article
               key={`${item.name}-${item.category}`}
-              className="group flex h-full basis-[calc((100%-0.75rem)/2)] flex-col rounded-lg border-2 lg:basis-[calc((100%-2rem)/3)] border-[#49E681] bg-[#DFF3FF] p-2 text-[#12345A] shadow-lg shadow-black/20 transition hover:-translate-y-1 hover:shadow-[#49E681]/20 sm:p-3"
+              className="group interactive-lift flex h-full w-[min(16.5rem,calc(100vw-2rem))] flex-col rounded-lg border-2 border-[#49E681] bg-[#DFF3FF] p-3.5 text-[#12345A] shadow-lg shadow-black/25 transition duration-300 hover:shadow-[#49E681]/20 sm:w-[24rem] sm:p-4 lg:w-auto lg:basis-[calc((100%-2rem)/3)]"
             >
               <div className="flex items-center justify-between gap-3">
                 <span className="inline-flex rounded-full bg-[#22C55E] px-2 py-1 text-[0.5rem] font-extrabold leading-none text-white sm:px-2.5 sm:text-[0.65rem]">
