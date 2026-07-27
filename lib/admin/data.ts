@@ -636,3 +636,27 @@ export async function changeOwnAdminPassword(adminId: string, formData: FormData
 
   return { persisted: true, status: "saved" };
 }
+
+export async function updateOrderStatus(
+  orderCode: string,
+  status: string,
+  paymentStatus: string,
+) {
+  if (!hasSupabaseAdminEnv()) {
+    return { persisted: false, status: "demo" };
+  }
+
+  const updatePayload: Record<string, unknown> = {
+    status,
+    payment_status: paymentStatus,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (paymentStatus === "paid") {
+    updatePayload.paid_at = new Date().toISOString();
+  }
+
+  await supabaseUpdateWhere("orders", "order_code", orderCode, updatePayload);
+
+  return { persisted: true, status: "updated" };
+}

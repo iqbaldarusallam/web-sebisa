@@ -20,19 +20,25 @@ const statusContent = {
     label: "Menunggu follow-up tim",
     title: "Order berhasil masuk.",
     description:
-      "Payment gateway belum aktif, jadi tim Sebisa Project akan menghubungi Anda untuk instruksi pembayaran dan konfirmasi project.",
+      "Tim Sebisa Project akan menghubungi Anda untuk instruksi pembayaran dan konfirmasi project.",
+  },
+  whatsapp: {
+    label: "Menuju WhatsApp",
+    title: "Order berhasil dibuat.",
+    description:
+      "Anda akan dialihkan ke WhatsApp untuk menyelesaikan pembayaran. Tim kami akan mengkonfirmasi order Anda.",
   },
   paid: {
     label: "Pembayaran diterima",
     title: "Pembayaran berhasil diterima.",
     description:
-      "Terima kasih. Status final tetap akan dicocokkan otomatis melalui Midtrans sebelum project diproses tim.",
+      "Terima kasih. Tim Sebisa Project akan memproses project Anda setelah konfirmasi pembayaran.",
   },
   pending: {
     label: "Menunggu pembayaran",
     title: "Order berhasil dibuat.",
     description:
-      "Pembayaran masih pending. Anda bisa menyelesaikan pembayaran melalui halaman Midtrans, lalu tim kami akan melakukan follow-up.",
+      "Pembayaran masih pending. Silakan hubungi kami via WhatsApp untuk menyelesaikan pembayaran.",
   },
 };
 

@@ -1,18 +1,32 @@
 import CountUpValue from "./CountUpValue";
 import MotionReveal from "./MotionReveal";
+import {
+  HiChartBarSquare,
+  HiCog6Tooth,
+  HiShieldCheck,
+  HiDocumentText,
+} from "react-icons/hi2";
 
 const reasons = [
   {
-    title: "Bergaransi & Revisi Cepat Tanggap",
-    description: "Setiap project yang datang dengan garansi kepuasan penuh.",
+    icon: HiChartBarSquare,
+    title: "Strategi Berbasis Data",
+    description: "Setiap keputusan didasarkan pada analisis data dan insight pasar yang akurat.",
   },
   {
-    title: "Fast Response & Support Aktif",
-    description: "Tim merespon cepat di setiap tahap project anda.",
+    icon: HiCog6Tooth,
+    title: "Konten Konsisten & Menarik",
+    description: "Konten yang terencana dan konsisten untuk membangun brand awareness yang kuat.",
   },
   {
-    title: "Desain Modern & Strategi Tepat",
-    description: "Dioptimasi untuk branding, campaign, dan pengalaman audiens.",
+    icon: HiShieldCheck,
+    title: "Optimasi Marketplace & Social Media",
+    description: "Optimasi menyeluruh di berbagai platform untuk hasil yang maksimal.",
+  },
+  {
+    icon: HiDocumentText,
+    title: "Laporan Transparan & Terukur",
+    description: "Laporan performa bulanan yang jelas untuk evaluasi strategi bisnis Anda.",
   },
 ];
 
@@ -45,21 +59,24 @@ export default function WhyChooseUs() {
           </h2>
 
           <div className="mt-5 space-y-4">
-            {reasons.map((reason, index) => (
-              <article key={reason.title} className="flex items-center gap-3.5">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#12345A] text-[1.25rem] font-extrabold leading-none text-white sm:h-12 sm:w-12 sm:text-[1.45rem]">
-                  {String(index + 1).padStart(2, "0")}
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-sm font-extrabold leading-tight text-[#3a3a3a] sm:text-base">
-                    {reason.title}
-                  </h3>
-                  <p className="mt-0.5 text-[0.7rem] font-semibold leading-snug text-[#153A66] sm:text-xs">
-                    {reason.description}
-                  </p>
-                </div>
-              </article>
-            ))}
+            {reasons.map((reason) => {
+              const Icon = reason.icon;
+              return (
+                <article key={reason.title} className="flex items-center gap-3.5">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#12345A] sm:h-12 sm:w-12">
+                    <Icon className="h-6 w-6 text-[#20C4E8]" aria-hidden="true" />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-extrabold leading-tight text-[#3a3a3a] sm:text-base">
+                      {reason.title}
+                    </h3>
+                    <p className="mt-0.5 text-[0.7rem] font-semibold leading-snug text-[#153A66] sm:text-xs">
+                      {reason.description}
+                    </p>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </MotionReveal>
 

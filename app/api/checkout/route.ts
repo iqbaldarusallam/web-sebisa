@@ -43,7 +43,6 @@ export async function POST(request: Request) {
 
     return Response.json({
       ok: true,
-      snap_token: result.snapToken,
       ...result,
     });
   } catch (error) {

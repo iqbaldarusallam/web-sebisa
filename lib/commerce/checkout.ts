@@ -5,12 +5,6 @@ import {
   supabaseUpdateWhere,
 } from "@/lib/integrations/supabase-rest";
 import { getServicePrice } from "@/data/services";
-import {
-  createMidtransSnapTransaction,
-  getMidtransConfigIssue,
-  hasMidtransEnv,
-  type MidtransNotification,
-} from "./midtrans";
 import { randomUUID } from "crypto";
 
 export type CheckoutInput = {
@@ -26,9 +20,7 @@ export type CheckoutResult = {
   orderCode: string;
   amount: number;
   paymentConfigured: boolean;
-  snapToken: string | null;
-  redirectUrl: string | null;
-  token: string | null;
+  whatsappUrl: string | null;
 };
 
 export type CheckoutOptions = {
@@ -43,9 +35,7 @@ function createManualPaymentResult(
     orderCode,
     amount,
     paymentConfigured: false,
-    snapToken: null,
-    redirectUrl: null,
-    token: null,
+    whatsappUrl: null,
   };
 }
 
@@ -185,118 +175,24 @@ export async function createCheckout(
     }
   }
 
-  if (!hasMidtransEnv()) {
-    console.warn("Midtrans is not ready:", getMidtransConfigIssue());
-    return createManualPaymentResult(orderCode, amount);
-  }
-
-  let transaction;
-
-  try {
-    transaction = await createMidtransSnapTransaction({
-      orderId: orderCode,
-      amount,
-      customerName: input.name,
-      email: input.email,
-      phone: input.whatsapp,
-      serviceName: input.serviceName,
-      brand: input.brand,
-      finishRedirectUrl: options.origin
-        ? `${options.origin}/checkout/success?order_id=${encodeURIComponent(orderCode)}`
-        : null,
-    });
-  } catch (error) {
-    console.error("Midtrans Snap transaction failed:", error);
-
-    if (orderPersisted) {
-      try {
-        await supabaseUpdateWhere("orders", "order_code", orderCode, {
-          payment_status: "payment_gateway_error",
-          updated_at: new Date().toISOString(),
-        });
-      } catch (updateError) {
-        console.error("Checkout order status update failed:", updateError);
-      }
-    }
-
-    return createManualPaymentResult(orderCode, amount);
-  }
-
-  if (orderPersisted) {
-    try {
-      await supabaseInsert("payments", {
-        order_code: orderCode,
-        provider: "midtrans",
-        payment_status: "pending",
-        snap_token: transaction.token,
-        redirect_url: transaction.redirect_url,
-        amount,
-      });
-    } catch (error) {
-      console.error("Checkout payment insert failed:", error);
-    }
-  }
+  // Build WhatsApp message with order details
+  const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "6281234567890";
+  const waMessage = encodeURIComponent(
+    `Halo Sebisa Project!\n\n` +
+    `Saya ingin melakukan pembayaran untuk order:\n` +
+    `• Kode Order: ${orderCode}\n` +
+    `• Layanan: ${input.serviceName}\n` +
+    `• Brand: ${input.brand}\n` +
+    `• Total: Rp ${amount.toLocaleString("id-ID")}\n\n` +
+    `Mohon instruksi pembayaran selanjutnya. Terima kasih.`
+  );
+  const whatsappUrl = `https://wa.me/${waNumber}?text=${waMessage}`;
 
   return {
     orderCode,
     amount,
     paymentConfigured: true,
-    snapToken: transaction.token,
-    redirectUrl: transaction.redirect_url,
-    token: transaction.token,
+    whatsappUrl,
   };
 }
 
-function mapMidtransToOrderStatus(status: string) {
-  if (status === "settlement" || status === "capture") {
-    return "paid";
-  }
-
-  if (status === "expire") {
-    return "expired";
-  }
-
-  if (status === "deny" || status === "failure") {
-    return "failed";
-  }
-
-  if (status === "cancel") {
-    return "cancelled";
-  }
-
-  return "pending_payment";
-}
-
-export async function applyMidtransNotification(payload: MidtransNotification) {
-  if (!hasSupabaseAdminEnv()) {
-    return { persisted: false };
-  }
-
-  const paidAt =
-    payload.transaction_status === "settlement" ||
-    payload.transaction_status === "capture"
-      ? new Date().toISOString()
-      : null;
-
-  await supabaseInsert("payment_events", {
-    order_code: payload.order_id,
-    provider: "midtrans",
-    event_type: payload.transaction_status,
-    payload,
-  });
-
-  await supabaseUpdateWhere("orders", "order_code", payload.order_id, {
-    status: mapMidtransToOrderStatus(payload.transaction_status),
-    payment_status: payload.transaction_status,
-    payment_method: payload.payment_type ?? null,
-    paid_at: paidAt,
-    updated_at: new Date().toISOString(),
-  });
-
-  await supabaseUpdateWhere("payments", "order_code", payload.order_id, {
-    payment_status: payload.transaction_status,
-    updated_at: new Date().toISOString(),
-  });
-
-  return { persisted: true };
-}

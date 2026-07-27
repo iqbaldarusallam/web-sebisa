@@ -20,125 +20,165 @@ export type Service = {
 };
 
 export const services: Service[] = [
+  // === PAKET UTAMA ===
   {
-    title: "Pengelolaan Media Sosial Instagram & TikTok",
+    title: "Starter Package",
     description:
-      "Perencanaan konten, desain visual, caption, kalender posting, dan optimasi akun untuk kebutuhan promosi brand.",
+      "Paket awal untuk bisnis yang ingin memulai strategi konten social media secara konsisten dan profesional.",
     icon: "social",
+    price: 3500000,
+    compareAtPrice: 5000000,
+    badgeType: "custom",
+    badgeLabel: "Populer untuk Pemula",
+    features: [
+      "5 Video mirroring TikTok & Instagram",
+      "2 Carousel mirroring TikTok & Instagram",
+      "Content Planning",
+      "Copywriting",
+      "Free pembuatan akun (TikTok Shop/Shopee/Marketplace)",
+      "1x Revisi Minor",
+    ],
+    durationLabel: "/bulan",
+  },
+  {
+    title: "Growth Package",
+    description:
+      "Paket lengkap untuk bisnis yang inginscale up dengan iklan digital dan performa yang terukur.",
+    icon: "ads",
+    price: 4200000,
+    compareAtPrice: 6500000,
+    badgeType: "popular",
+    isPopular: true,
+    features: [
+      "Semua benefit Starter",
+      "TikTok Ads Management",
+      "1x Online Meeting",
+      "Weekly Performance Report",
+      "Optimasi Campaign",
+      "Konsultasi Marketing",
+    ],
+    durationLabel: "/bulan",
+  },
+  {
+    title: "Scale Package",
+    description:
+      "Paket premium untuk bisnis yang ingin dominasi di berbagai platform dengan strategi komprehensif.",
+    icon: "website",
+    price: 7500000,
+    compareAtPrice: 12000000,
+    badgeType: "custom",
+    badgeLabel: "Best Value",
+    features: [
+      "Semua benefit Growth",
+      "TikTok Ads",
+      "Shopee Ads",
+      "Marketplace Optimization",
+      "Weekly Strategy Meeting",
+      "Dashboard Performance",
+      "Prioritas Revisi",
+    ],
+    durationLabel: "/bulan",
+  },
+
+  // === ADD-ON SERVICES ===
+  {
+    title: "TikTok Ads Management",
+    description:
+      "Pengelolaan iklan TikTok profesional untuk meningkatkan reach, engagement, dan konversi penjualan.",
+    icon: "ads",
     price: 1500000,
-    compareAtPrice: 2500000,
-  },
-  {
-    title: "Pengelolaan Media Sosial YouTube",
-    description:
-      "Pengembangan konsep konten YouTube, optimasi channel, thumbnail, judul, dan kebutuhan publikasi video.",
-    icon: "video",
-    price: 1750000,
     compareAtPrice: 3000000,
+    badgeType: "custom",
+    badgeLabel: "Add-On",
+    durationLabel: "/bulan",
   },
   {
-    title: "Pembuatan Foto Produk Profesional",
+    title: "Shopee Ads Management",
     description:
-      "Foto produk untuk katalog, media sosial, marketplace, dan materi promosi agar brand terlihat lebih kredibel.",
-    icon: "video",
+      "Pengelolaan iklan Shopee untuk meningkatkan visibilitas produk dan penjualan di marketplace.",
+    icon: "store",
     price: 750000,
-    compareAtPrice: 1200000,
-  },
-  {
-    title: "Pengelolaan Marketplace & Optimasi Toko Online",
-    description:
-      "Merapikan tampilan toko, katalog produk, visual, deskripsi, dan kebutuhan campaign di marketplace.",
-    icon: "store",
-    price: 1250000,
     compareAtPrice: 2000000,
+    badgeType: "custom",
+    badgeLabel: "Add-On",
+    durationLabel: "/bulan",
   },
   {
-    title: "Pembuatan Surat Undangan Online Untuk Event / EO",
+    title: "Video Tambahan Feed Instagram",
     description:
-      "Undangan digital interaktif untuk acara, event organizer, wedding, gathering, dan kebutuhan publikasi event.",
-    icon: "landing",
-    price: 650000,
-    compareAtPrice: 1000000,
-  },
-  {
-    title: "Pengembangan Channel YouTube",
-    description:
-      "Membangun arah channel, format konten, jadwal publikasi, dan identitas visual agar channel lebih konsisten.",
+      "Produksi video konten Instagram Feed untuk memperkuat brand awareness dan engagement.",
     icon: "video",
-    price: 2000000,
-    compareAtPrice: 3500000,
+    price: 250000,
+    compareAtPrice: 400000,
+    badgeType: "custom",
+    badgeLabel: "Add-On",
+    durationLabel: "/video",
   },
   {
-    title: "Pengembangan Iklan YouTube",
+    title: "Carousel Reels",
     description:
-      "Menyusun kebutuhan campaign YouTube Ads, materi iklan, dan arah komunikasi agar promosi lebih terukur.",
-    icon: "ads",
-    price: 1750000,
-    compareAtPrice: 3000000,
-  },
-  {
-    title: "Podcast & Produksi Konten Audio Visual",
-    description:
-      "Produksi konten audio visual untuk podcast, video campaign, dokumentasi, dan kebutuhan promosi brand.",
-    icon: "video",
-    price: 2500000,
-    compareAtPrice: 4000000,
-  },
-  {
-    title: "Pengelolaan Media Sosial untuk Event Tertentu",
-    description:
-      "Support konten, publikasi, dan dokumentasi digital untuk campaign event, launching, maupun acara khusus.",
+      "Desain carousel dan reels untuk konten Instagram yang menarik dan informatif.",
     icon: "social",
-    price: 1250000,
-    compareAtPrice: 2000000,
+    price: 150000,
+    compareAtPrice: 250000,
+    badgeType: "custom",
+    badgeLabel: "Add-On",
+    durationLabel: "/desain",
   },
   {
-    title: "Pembuatan Video Iklan Profesional",
+    title: "Video Tambahan Reels",
     description:
-      "Video promosi singkat untuk iklan digital, social media, produk, layanan, dan campaign brand.",
+      "Produksi video reels untuk konten Instagram dan TikTok yang viral dan engaging.",
     icon: "video",
-    price: 1750000,
-    compareAtPrice: 3000000,
+    price: 250000,
+    compareAtPrice: 400000,
+    badgeType: "custom",
+    badgeLabel: "Add-On",
+    durationLabel: "/desain",
   },
   {
-    title: "Pengelolaan Iklan Media Digital",
+    title: "Copywriting",
     description:
-      "Strategi dan pengelolaan iklan digital untuk menjangkau audiens yang lebih tepat dan mudah dievaluasi.",
-    icon: "ads",
-    price: 1500000,
-    compareAtPrice: 2500000,
-  },
-  {
-    title: "Pembuatan Website Profesional",
-    description:
-      "Website company profile, katalog, dan profil bisnis yang responsif, modern, dan siap memperkuat kredibilitas.",
-    icon: "website",
-    price: 2500000,
-    compareAtPrice: 4500000,
-  },
-  {
-    title: "Landing Page & Payment Gateway",
-    description:
-      "Landing page promosi yang fokus pada konversi dan dapat dikembangkan untuk kebutuhan pembayaran online.",
+      "Penulisan konten copywriting profesional untuk caption, deskripsi produk, dan materi promosi.",
     icon: "landing",
-    price: 1500000,
-    compareAtPrice: 3000000,
+    price: 75000,
+    compareAtPrice: 150000,
+    badgeType: "custom",
+    badgeLabel: "Add-On",
+    durationLabel: "/konten",
   },
   {
-    title: "Paket Lengkap Kebutuhan Digital Bisnis",
+    title: "Product Photoshoot",
     description:
-      "Paket terintegrasi untuk website, konten, social media, visual campaign, dan kebutuhan digital bisnis lainnya.",
-    icon: "website",
-    price: 4500000,
-    compareAtPrice: 7500000,
+      "Sesi foto produk profesional untuk katalog, marketplace, dan materi promosi brand.",
+    icon: "video",
+    price: 500000,
+    compareAtPrice: 800000,
+    badgeType: "custom",
+    badgeLabel: "Add-On",
+    durationLabel: "/sesi",
   },
   {
-    title: "Merchandise Campaign",
+    title: "Transport Extra",
     description:
-      "Konsep dan desain merchandise untuk kebutuhan promosi, event, komunitas, dan campaign brand.",
+      "Biaya transportasi untuk sesi foto atau video di luar lokasi studio.",
     icon: "store",
-    price: 1000000,
-    compareAtPrice: 1750000,
+    price: 100000,
+    compareAtPrice: 150000,
+    badgeType: "custom",
+    badgeLabel: "Add-On",
+    durationLabel: "/perjalanan",
+  },
+  {
+    title: "Extra Revisi",
+    description:
+      "Biaya tambahan untuk revisi di luar kuota yang sudah ditentukan dalam paket.",
+    icon: "landing",
+    price: 100000,
+    compareAtPrice: 150000,
+    badgeType: "custom",
+    badgeLabel: "Add-On",
+    durationLabel: "/revisi",
   },
 ];
 

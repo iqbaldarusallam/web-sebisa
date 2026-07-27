@@ -1,7 +1,6 @@
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { getMidtransClientConfig } from "@/lib/commerce/midtrans";
 import { getPublicCmsContent } from "@/lib/public/cms";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -10,7 +9,7 @@ import { HiChatBubbleLeftRight, HiCreditCard, HiShieldCheck } from "react-icons/
 export const metadata: Metadata = {
   title: "Checkout Project | Sebisa Project",
   description:
-    "Mulai transaksi project digital bersama Sebisa Project melalui pilihan layanan, harga promo, form order, dan payment gateway.",
+    "Mulai transaksi project digital bersama Sebisa Project melalui pilihan layanan, harga promo, form order, dan pembayaran via WhatsApp.",
 };
 
 export default async function CheckoutPage({
@@ -19,7 +18,6 @@ export default async function CheckoutPage({
   searchParams: Promise<{ service?: string }>;
 }) {
   const params = await searchParams;
-  const midtransConfig = getMidtransClientConfig();
   const cms = await getPublicCmsContent();
 
   return (
@@ -38,13 +36,13 @@ export default async function CheckoutPage({
               </h1>
               <p className="mt-4 max-w-xl text-sm font-medium leading-6 text-white/64 sm:mt-5 sm:text-base sm:leading-7">
                 Form ini membantu tim kami menerima detail kebutuhan, mencatat
-                order, dan memproses pembayaran layanan dengan alur yang lebih rapi.
+                order, dan memproses pembayaran layanan melalui WhatsApp.
               </p>
 
               <div className="mt-6 grid max-w-xl gap-2.5 sm:mt-8 sm:grid-cols-3 sm:gap-3">
                 {[
                   { icon: HiChatBubbleLeftRight, label: "Detail project tercatat" },
-                  { icon: HiCreditCard, label: "Pembayaran awal lebih mudah" },
+                  { icon: HiCreditCard, label: "Pembayaran via WhatsApp" },
                   { icon: HiShieldCheck, label: "Follow-up lebih terarah" },
                 ].map((item) => {
                   const Icon = item.icon;
@@ -68,7 +66,6 @@ export default async function CheckoutPage({
 
             <CheckoutForm
               initialService={params.service}
-              midtransConfig={midtransConfig}
               services={cms.services}
             />
           </div>

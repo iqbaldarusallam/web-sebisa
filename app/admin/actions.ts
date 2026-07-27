@@ -9,6 +9,7 @@ import {
   deleteCmsRecord,
   saveAdminUser,
   saveCmsRecord,
+  updateOrderStatus,
 } from "@/lib/admin/data";
 import type { CmsCollectionKey } from "@/lib/admin/types";
 import { AuthError } from "next-auth";
@@ -144,4 +145,21 @@ export async function changeAdminPassword(formData: FormData) {
 
   revalidatePath("/admin");
   redirect(`${redirectTo}?${query}`);
+}
+
+export async function updateOrderStatusAction(formData: FormData) {
+  await requireAdminSession();
+
+  const orderCode = String(formData.get("orderCode") ?? "");
+  const status = String(formData.get("status") ?? "");
+  const paymentStatus = String(formData.get("paymentStatus") ?? "");
+
+  if (!orderCode || !status || !paymentStatus) {
+    redirect("/admin/transaksi?error=invalid");
+  }
+
+  const result = await updateOrderStatus(orderCode, status, paymentStatus);
+
+  revalidatePath("/admin/transaksi");
+  redirect(`/admin/transaksi?updated=${result.persisted ? "1" : "demo"}`);
 }

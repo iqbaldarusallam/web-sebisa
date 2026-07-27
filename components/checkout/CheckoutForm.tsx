@@ -3,14 +3,12 @@
 import type { Service } from "@/data/services";
 import { useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import Script from "next/script";
 import {
   HiArrowPath,
   HiCheckCircle,
-  HiCreditCard,
+  HiChatBubbleLeftRight,
   HiExclamationTriangle,
 } from "react-icons/hi2";
-import type { MidtransClientConfig } from "@/lib/commerce/midtrans";
 
 import { IoIosPricetags } from "react-icons/io";
 type CheckoutResponse = {
@@ -19,26 +17,8 @@ type CheckoutResponse = {
   orderCode?: string;
   amount?: number;
   paymentConfigured?: boolean;
-  snapToken?: string | null;
-  snap_token?: string | null;
-  token?: string | null;
-  redirectUrl?: string | null;
+  whatsappUrl?: string | null;
 };
-
-type SnapCallbacks = {
-  onSuccess?: (result: unknown) => void;
-  onPending?: (result: unknown) => void;
-  onError?: (result: unknown) => void;
-  onClose?: () => void;
-};
-
-declare global {
-  interface Window {
-    snap?: {
-      pay: (token: string, callbacks?: SnapCallbacks) => void;
-    };
-  }
-}
 
 function formatMoney(value: number) {
   return new Intl.NumberFormat("id-ID", {
@@ -57,11 +37,9 @@ const helperClass = "mt-1.5 text-[0.68rem] font-semibold leading-5 text-white/42
 
 export default function CheckoutForm({
   initialService,
-  midtransConfig,
   services,
 }: {
   initialService?: string;
-  midtransConfig: MidtransClientConfig;
   services: Service[];
 }) {
   const router = useRouter();
@@ -70,7 +48,6 @@ export default function CheckoutForm({
   >("idle");
   const [message, setMessage] = useState("");
   const [orderCode, setOrderCode] = useState("");
-  const [snapReady, setSnapReady] = useState(false);
   const serviceVariants = useMemo(
     () => services.map((service) => service.title),
     [services],
@@ -123,55 +100,21 @@ export default function CheckoutForm({
 
       setOrderCode(data.orderCode ?? "");
       const currentOrderCode = data.orderCode ?? "";
-      const snapToken = data.snapToken ?? data.snap_token ?? data.token ?? null;
 
-      if (snapToken) {
-        if (!snapReady || !window.snap) {
-          if (data.redirectUrl) {
-            setMessage("Mengalihkan ke halaman pembayaran Midtrans.");
-            window.location.assign(data.redirectUrl);
-            return;
-          }
+      // Redirect to WhatsApp for payment
+      if (data.whatsappUrl) {
+        setStatus("success");
+        setMessage(
+          `Order ${currentOrderCode} berhasil dibuat. Mengalihkan ke WhatsApp untuk pembayaran.`,
+        );
+        form.reset();
 
-          setStatus("error");
-          setMessage(
-            "Payment gateway belum siap dimuat. Coba ulangi beberapa detik lagi.",
-          );
-          return;
-        }
+        // Redirect to WhatsApp after a short delay
+        setTimeout(() => {
+          window.location.href = data.whatsappUrl!;
+        }, 1500);
 
-        setMessage("Membuka Midtrans Snap.");
-        window.snap.pay(snapToken, {
-          onSuccess: () => {
-            setStatus("success");
-            setMessage(
-              `Pembayaran untuk order ${currentOrderCode} diterima Midtrans. Status final akan dikonfirmasi melalui webhook.`,
-            );
-            form.reset();
-            goToSuccess(currentOrderCode, "paid");
-          },
-          onPending: () => {
-            setStatus("success");
-            setMessage(
-              `Order ${currentOrderCode} sedang menunggu pembayaran. Status final akan diperbarui otomatis oleh Midtrans.`,
-            );
-            form.reset();
-            goToSuccess(currentOrderCode, "pending");
-          },
-          onError: () => {
-            setStatus("error");
-            setMessage(
-              `Pembayaran order ${currentOrderCode} gagal diproses Midtrans. Silakan coba lagi atau hubungi admin.`,
-            );
-          },
-          onClose: () => {
-            setStatus("success");
-            setMessage(
-              `Order ${currentOrderCode} sudah dibuat dan masih pending. Silakan lanjutkan pembayaran saat siap.`,
-            );
-            goToSuccess(currentOrderCode, "pending");
-          },
-        });
+        goToSuccess(currentOrderCode, "whatsapp");
         return;
       }
 
@@ -193,16 +136,6 @@ export default function CheckoutForm({
 
   return (
     <>
-      {midtransConfig.clientKey ? (
-        <Script
-          id="midtrans-snap"
-          src={midtransConfig.snapScriptUrl}
-          strategy="afterInteractive"
-          data-client-key={midtransConfig.clientKey}
-          onReady={() => setSnapReady(true)}
-          onError={() => setSnapReady(false)}
-        />
-      ) : null}
       <form
         onSubmit={handleSubmit}
         className="rounded-2xl border border-white/12 bg-white/8 p-4 shadow-2xl shadow-black/25 backdrop-blur-xl sm:rounded-3xl sm:p-7"
@@ -218,7 +151,7 @@ export default function CheckoutForm({
             </p>
           </div>
           <span className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#20C4E8] text-[#041B38] sm:flex">
-            <HiCreditCard className="h-6 w-6" aria-hidden="true" />
+            <HiChatBubbleLeftRight className="h-6 w-6" aria-hidden="true" />
           </span>
         </div>
 
@@ -348,8 +281,8 @@ export default function CheckoutForm({
           </>
         ) : (
           <>
-            Lanjut Pembayaran
-            <HiCreditCard className="h-5 w-5" aria-hidden="true" />
+            Lanjut ke WhatsApp
+            <HiChatBubbleLeftRight className="h-5 w-5" aria-hidden="true" />
           </>
         )}
       </button>

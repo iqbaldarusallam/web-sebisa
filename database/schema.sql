@@ -157,10 +157,8 @@ alter table public.orders drop column if exists product;
 create table if not exists public.payments (
   id uuid primary key default gen_random_uuid(),
   order_code text not null references public.orders(order_code) on delete cascade,
-  provider text not null default 'midtrans',
+  provider text not null default 'whatsapp',
   payment_status text not null default 'pending',
-  snap_token text,
-  redirect_url text,
   amount integer not null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

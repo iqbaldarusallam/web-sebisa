@@ -1,4 +1,5 @@
 import { getAdminSnapshot } from "@/lib/admin/data";
+import { updateOrderStatusAction } from "@/app/admin/actions";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -22,6 +23,20 @@ function formatDate(value: string) {
     minute: "2-digit",
   }).format(new Date(value));
 }
+
+const orderStatuses = [
+  { value: "pending_payment", label: "Menunggu Pembayaran" },
+  { value: "processing", label: "Diproses" },
+  { value: "completed", label: "Selesai" },
+  { value: "cancelled", label: "Dibatalkan" },
+];
+
+const paymentStatuses = [
+  { value: "pending", label: "Pending" },
+  { value: "paid", label: "Lunas" },
+  { value: "failed", label: "Gagal" },
+  { value: "refunded", label: "Refund" },
+];
 
 export default async function AdminTransaksiPage() {
   const snapshot = await getAdminSnapshot();
@@ -49,11 +64,11 @@ export default async function AdminTransaksiPage() {
         <div className="flex flex-col gap-1 border-b border-slate-200 px-5 py-4">
           <h2 className="text-xl font-black">Data Transaksi</h2>
           <p className="text-sm font-semibold text-slate-500">
-            Status order dan payment gateway.
+            Kelola status order dan pembayaran.
           </p>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[980px] text-left">
+          <table className="w-full min-w-[1100px] text-left">
             <thead className="bg-slate-50 text-xs uppercase tracking-[0.08em] text-slate-500">
               <tr>
                 {[
@@ -64,6 +79,7 @@ export default async function AdminTransaksiPage() {
                   "Order Status",
                   "Status Pembayaran",
                   "Tanggal Transaksi",
+                  "Aksi",
                 ].map((column) => (
                   <th key={column} className="px-5 py-3.5 font-black">
                     {column}
@@ -75,7 +91,7 @@ export default async function AdminTransaksiPage() {
               {snapshot.orders.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={8}
                     className="px-5 py-12 text-center font-semibold text-slate-500"
                   >
                     Belum ada transaksi.
@@ -107,17 +123,56 @@ export default async function AdminTransaksiPage() {
                       {formatMoney(order.amount)}
                     </td>
                     <td className="px-5 py-4">
-                      <span className="rounded-full bg-cyan-50 px-3 py-1 text-xs font-black text-cyan-700">
-                        {order.status.replace("_", " ")}
-                      </span>
+                      <form action={updateOrderStatusAction}>
+                        <input type="hidden" name="orderCode" value={order.orderCode} />
+                        <input type="hidden" name="paymentStatus" value={order.paymentStatus} />
+                        <select
+                          name="status"
+                          defaultValue={order.status}
+                          onChange={(e) => e.currentTarget.form?.requestSubmit()}
+                          className="rounded-full bg-cyan-50 px-3 py-1 text-xs font-black text-cyan-700 border-0 cursor-pointer"
+                        >
+                          {orderStatuses.map((s) => (
+                            <option key={s.value} value={s.value}>
+                              {s.label}
+                            </option>
+                          ))}
+                        </select>
+                      </form>
                     </td>
                     <td className="px-5 py-4">
-                      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-600">
-                        {order.paymentStatus}
-                      </span>
+                      <form action={updateOrderStatusAction}>
+                        <input type="hidden" name="orderCode" value={order.orderCode} />
+                        <input type="hidden" name="status" value={order.status} />
+                        <select
+                          name="paymentStatus"
+                          defaultValue={order.paymentStatus}
+                          onChange={(e) => e.currentTarget.form?.requestSubmit()}
+                          className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-600 border-0 cursor-pointer"
+                        >
+                          {paymentStatuses.map((s) => (
+                            <option key={s.value} value={s.value}>
+                              {s.label}
+                            </option>
+                          ))}
+                        </select>
+                      </form>
                     </td>
                     <td className="px-5 py-4 text-xs font-semibold text-slate-500">
                       {formatDate(order.createdAt)}
+                    </td>
+                    <td className="px-5 py-4">
+                      <a
+                        href={`https://wa.me/${order.whatsapp.replace(/[^0-9]/g, "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 rounded-full bg-green-500 px-3 py-1 text-xs font-black text-white hover:bg-green-600"
+                      >
+                        <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                        </svg>
+                        Hubungi
+                      </a>
                     </td>
                   </tr>
                 ))
