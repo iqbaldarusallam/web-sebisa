@@ -19,8 +19,17 @@ export type BtsItem = {
   thumbnailUrl: string | null;
 };
 
+export type IntroVideo = {
+  title: string;
+  videoUrl: string;
+  thumbnailUrl: string | null;
+  showOnHome: boolean;
+  showOnTeam: boolean;
+};
+
 type PublicCmsContent = {
   bts: BtsItem[];
+  introVideos: IntroVideo[];
   clients: ClientLogo[];
   services: Service[];
   portfolio: PortfolioItem[];
@@ -118,6 +127,7 @@ export async function getPublicCmsContent(): Promise<PublicCmsContent> {
   if (!hasSupabasePublicEnv()) {
     return {
       bts: [],
+      introVideos: [],
       clients: fallbackClients,
       services: fallbackServices,
       portfolio: fallbackPortfolio,
@@ -127,7 +137,7 @@ export async function getPublicCmsContent(): Promise<PublicCmsContent> {
   }
 
   try {
-    const [bts, clients, services, portfolio, team, testimonials] = await Promise.all([
+    const [bts, introVideos, clients, services, portfolio, team, testimonials] = await Promise.all([
       publicSelect<{
         title: string;
         description: string;
@@ -136,6 +146,16 @@ export async function getPublicCmsContent(): Promise<PublicCmsContent> {
       }>(
         "bts_items",
         "select=title,description,video_url,thumbnail_url&is_published=eq.true&order=sort_order.asc",
+      ),
+      publicSelect<{
+        title: string;
+        video_url: string;
+        thumbnail_url: string | null;
+        show_on_home: boolean;
+        show_on_team: boolean;
+      }>(
+        "intro_videos",
+        "select=title,video_url,thumbnail_url,show_on_home,show_on_team&is_published=eq.true&order=sort_order.asc",
       ),
       publicSelect<{
         name: string;
@@ -198,6 +218,16 @@ export async function getPublicCmsContent(): Promise<PublicCmsContent> {
               description: item.description,
               videoUrl: item.video_url,
               thumbnailUrl: item.thumbnail_url,
+            }))
+          : [],
+      introVideos:
+        introVideos.length > 0
+          ? introVideos.map((item) => ({
+              title: item.title,
+              videoUrl: item.video_url,
+              thumbnailUrl: item.thumbnail_url,
+              showOnHome: item.show_on_home,
+              showOnTeam: item.show_on_team,
             }))
           : [],
       clients:
@@ -287,6 +317,7 @@ export async function getPublicCmsContent(): Promise<PublicCmsContent> {
   } catch {
     return {
       bts: [],
+      introVideos: [],
       clients: fallbackClients,
       services: fallbackServices,
       portfolio: fallbackPortfolio,

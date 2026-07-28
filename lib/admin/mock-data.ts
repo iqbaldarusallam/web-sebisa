@@ -6,6 +6,7 @@ import { testimonials } from "@/data/testimonials";
 import type {
   AdminClientLogo,
   AdminBtsItem,
+  AdminIntroVideo,
   AdminMessage,
   AdminOrder,
   AdminPortfolioItem,
@@ -211,6 +212,29 @@ export const mockBts: AdminBtsItem[] = [
   },
 ];
 
+export const mockIntroVideos: AdminIntroVideo[] = [
+  {
+    id: "intro-1",
+    title: "Sebisa Project Company Profile",
+    videoUrl: "https://res.cloudinary.com/dseqmekig/video/upload/v1/sebisa/intro/sample-intro-1.mp4",
+    thumbnailUrl: null,
+    showOnHome: true,
+    showOnTeam: true,
+    isPublished: true,
+    sortOrder: 1,
+  },
+  {
+    id: "intro-2",
+    title: "Kenali Tim Sebisa Project",
+    videoUrl: "https://res.cloudinary.com/dseqmekig/video/upload/v1/sebisa/intro/sample-intro-2.mp4",
+    thumbnailUrl: null,
+    showOnHome: true,
+    showOnTeam: true,
+    isPublished: true,
+    sortOrder: 2,
+  },
+];
+
 export const mockAdminSnapshot: AdminSnapshot = {
   supabaseConfigured: false,
   services: mockServices,
@@ -219,6 +243,7 @@ export const mockAdminSnapshot: AdminSnapshot = {
   team: mockTeam,
   clients: mockClients,
   bts: mockBts,
+  introVideos: mockIntroVideos,
   orders: mockOrders,
   messages: mockMessages,
 };

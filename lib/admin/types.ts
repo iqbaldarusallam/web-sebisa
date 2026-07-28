@@ -5,7 +5,8 @@ export type CmsCollectionKey =
   | "team"
   | "clients"
   | "messages"
-  | "bts";
+  | "bts"
+  | "introVideos";
 
 export type PaymentStatus =
   | "pending"
@@ -96,6 +97,17 @@ export type AdminBtsItem = {
   sortOrder: number;
 };
 
+export type AdminIntroVideo = {
+  id: string;
+  title: string;
+  videoUrl: string;
+  thumbnailUrl: string | null;
+  showOnHome: boolean;
+  showOnTeam: boolean;
+  isPublished: boolean;
+  sortOrder: number;
+};
+
 export type AdminOrder = {
   id: string;
   orderCode: string;
@@ -141,6 +153,7 @@ export type AdminSnapshot = {
   team: AdminTeamMember[];
   clients: AdminClientLogo[];
   bts: AdminBtsItem[];
+  introVideos: AdminIntroVideo[];
   orders: AdminOrder[];
   messages: AdminMessage[];
 };
@@ -152,4 +165,5 @@ export type AdminCollectionRow =
   | AdminTeamMember
   | AdminClientLogo
   | AdminBtsItem
+  | AdminIntroVideo
   | AdminMessage;

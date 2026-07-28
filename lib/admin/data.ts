@@ -13,6 +13,7 @@ import type {
   CmsCollectionKey,
   ServiceBadgeType,
   AdminBtsItem,
+  AdminIntroVideo,
 } from "./types";
 import { hashAdminPassword, verifyAdminPasswordHash } from "./password";
 import {
@@ -88,6 +89,17 @@ type SupabaseBtsRow = {
   description: string;
   video_url: string;
   thumbnail_url: string | null;
+  is_published: boolean;
+  sort_order: number;
+};
+
+type SupabaseIntroVideoRow = {
+  id: string;
+  title: string;
+  video_url: string;
+  thumbnail_url: string | null;
+  show_on_home: boolean;
+  show_on_team: boolean;
   is_published: boolean;
   sort_order: number;
 };
@@ -253,6 +265,19 @@ function toAdminBts(row: SupabaseBtsRow): AdminBtsItem {
   };
 }
 
+function toAdminIntroVideo(row: SupabaseIntroVideoRow): AdminIntroVideo {
+  return {
+    id: row.id,
+    title: row.title,
+    videoUrl: row.video_url,
+    thumbnailUrl: row.thumbnail_url,
+    showOnHome: row.show_on_home,
+    showOnTeam: row.show_on_team,
+    isPublished: row.is_published,
+    sortOrder: row.sort_order,
+  };
+}
+
 function toAdminOrder(row: SupabaseOrderRow): AdminOrder {
   return {
     id: row.id,
@@ -309,6 +334,7 @@ export async function getAdminSnapshot(): Promise<AdminSnapshot> {
       team,
       clients,
       bts,
+      introVideos,
       orders,
       messages,
     ] = await Promise.all([
@@ -318,6 +344,7 @@ export async function getAdminSnapshot(): Promise<AdminSnapshot> {
       supabaseSelect<SupabaseTeamRow>("team_members", orderQuery),
       supabaseSelect<SupabaseClientRow>("client_logos", orderQuery),
       supabaseSelect<SupabaseBtsRow>("bts_items", orderQuery),
+      supabaseSelect<SupabaseIntroVideoRow>("intro_videos", orderQuery),
       supabaseSelect<SupabaseOrderRow>("orders", "select=*&order=created_at.desc&limit=50"),
       supabaseSelect<SupabaseMessageRow>("contact_messages", "select=*&order=created_at.desc&limit=50"),
     ]);
@@ -330,6 +357,7 @@ export async function getAdminSnapshot(): Promise<AdminSnapshot> {
       team: team.map(toAdminTeam),
       clients: clients.map(toAdminClient),
       bts: bts.map(toAdminBts),
+      introVideos: introVideos.map(toAdminIntroVideo),
       orders: orders.map(toAdminOrder),
       messages: messages.map(toAdminMessage),
     };
@@ -430,6 +458,16 @@ export function buildPayload(collection: CmsCollectionKey, formData: FormData) {
         description: readString(formData, "description"),
         video_url: readString(formData, "videoUrl"),
         thumbnail_url: readNullableString(formData, "thumbnailUrl"),
+        is_published: formData.get("isPublished") === "on",
+        sort_order: readNumber(formData, "sortOrder", 999),
+      };
+    case "introVideos":
+      return {
+        title: readString(formData, "title"),
+        video_url: readString(formData, "videoUrl"),
+        thumbnail_url: readNullableString(formData, "thumbnailUrl"),
+        show_on_home: formData.get("showOnHome") === "on",
+        show_on_team: formData.get("showOnTeam") === "on",
         is_published: formData.get("isPublished") === "on",
         sort_order: readNumber(formData, "sortOrder", 999),
       };
