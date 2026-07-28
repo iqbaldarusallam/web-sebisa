@@ -14,6 +14,7 @@ import {
   HiSparkles,
   HiShieldCheck,
   HiUsers,
+  HiVideoCamera,
 } from "react-icons/hi2";
 
 const navItems = [
@@ -24,6 +25,7 @@ const navItems = [
   { label: "Tim", href: "/admin/tim", icon: HiUsers },
   { label: "Client / Kerjasama", href: "/admin/kerjasama", icon: HiSparkles },
   { label: "BTS", href: "/admin/bts", icon: HiCamera },
+  { label: "Video Perkenalan", href: "/admin/video-perkenalan", icon: HiVideoCamera },
   { label: "Transaksi", href: "/admin/transaksi", icon: HiCreditCard },
   { label: "Pesan Masuk", href: "/admin/pesan", icon: HiDocumentText },
   { label: "Admin", href: "/admin/admins", icon: HiShieldCheck, superAdminOnly: true },

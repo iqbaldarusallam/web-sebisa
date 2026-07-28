@@ -37,6 +37,7 @@ const publicPathsByCollection: Partial<Record<CmsCollectionKey, string[]>> = {
   team: ["/tim"],
   clients: ["/", "/kerjasama"],
   bts: ["/", "/bts"],
+  introVideos: ["/", "/tim"],
 };
 
 function revalidateCollectionPaths(collection: CmsCollectionKey, adminPath: string) {
