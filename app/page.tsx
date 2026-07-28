@@ -5,6 +5,7 @@ import Contact from "@/components/Contact";
 import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
+import IntroVideos from "@/components/IntroVideos";
 import Navbar from "@/components/Navbar";
 import Portfolio from "@/components/Portfolio";
 import Services from "@/components/Services";
@@ -22,6 +23,7 @@ export default async function Home() {
       <Hero />
       <ClientLogos items={cms.clients} />
       <About />
+      <IntroVideos items={cms.introVideos.filter((v) => v.showOnHome)} />
       <Services items={cms.services} />
       <WhyChooseUs />
       <Workflow />

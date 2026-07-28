@@ -1,4 +1,5 @@
 import Footer from "@/components/Footer";
+import IntroVideos from "@/components/IntroVideos";
 import Navbar from "@/components/Navbar";
 import TeamPhotoFrame from "@/components/TeamPhotoFrame";
 import { getPublicCmsContent } from "@/lib/public/cms";
@@ -423,6 +424,12 @@ export default async function TimPage() {
             </div>
           </div>
         </section>
+
+        <IntroVideos
+          items={cms.introVideos.filter((v) => v.showOnTeam)}
+          heading="Kenali Tim Kami Lebih Dekat"
+          subtitle="Video perkenalan tentang bagaimana tim Sebisa Project bekerja dan berkolaborasi."
+        />
 
         <section className="bg-[#DFF3FF] px-6 py-16 text-[#12345A] sm:px-8 lg:px-20">
           <div className="mx-auto max-w-7xl">
