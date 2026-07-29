@@ -45,13 +45,16 @@ input {
   color: #0a0f1e;
 }
 
-.marquee-track {
-  width: max-content;
-  animation: sebisa-marquee 34s linear infinite;
+.marquee-track-wrapper {
+  overflow: hidden;
+  width: 100%;
+  cursor: grab;
 }
 
-.marquee-track:hover {
-  animation-play-state: paused;
+.marquee-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
 }
 
 .sebisa-hidden-scrollbar {
@@ -168,16 +171,6 @@ input {
   }
 }
 
-@keyframes sebisa-marquee {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(-50%);
-  }
-}
-
 @media (min-width: 640px) {
   .testimonial-carousel-track {
     padding-right: max(0px, calc(100vw - 20rem - 9rem));
@@ -193,12 +186,5 @@ input {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
-  }
-
-  .marquee-track {
-    animation: none;
-    flex-wrap: wrap;
-    justify-content: center;
-    width: auto;
   }
 }
